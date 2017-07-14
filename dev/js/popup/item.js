@@ -3,6 +3,7 @@ const storage = require("./storage");
 const auth = require("./auth");
 const common = require("../common/common");
 const message = require("./message");
+const _group = require("./group");
 
 module.exports = new function() {
     /**
@@ -41,8 +42,6 @@ module.exports = new function() {
                 let data = common.getDataString(params);
                 request.get(data, data => {
                     $("#loader").remove();
-                    var existingItemsCount = $(handle + " .item").length;
-                    var html = "";
 
                     this.totalPages = data.pages;
 
@@ -50,61 +49,16 @@ module.exports = new function() {
                         html = "Nothing found.";
                     }
 
-                    data.rows.forEach((item, idx) => {
-                        let $html = $("#item-template").clone();
-
-                        let comments =
-                            item.comments === null ? "" : item.comments;
-
-                        let thumbnail = item.thumbnail;
-
-                        if (item.thumbnail == "" || item.thumbnail == null) {
-                            thumbnail = "assets/weed.jpg";
-                        }
-
-                        var gname = handle == "#wall" ? "" : `[${item.name}]`;
-
-                        var favourite =
-                            item.favourite == "1"
-                                ? "glyphicon-star"
-                                : "glyphicon-star-empty";
-
-                        var deleteBtn = item.uid == uid ? "Delete" : "";
-
-                        var item = $html
-                            .html()
-                            .replace("{NICKNAME}", common.escape(item.nickname))
-                            .replace("{SRNO}", ++existingItemsCount)
-                            .replace("{STAR}", favourite)
-                            .replace("{THUMB}", thumbnail)
-                            .replace("{ITEM_ID}", item.id)
-                            .replace("{USER_ID}", item.uid)
-                            .replace("{TITLE}", common.escape(item.title))
-                            .replace("{URL}", common.escape(item.url))
-                            .replace("{COMMENTS}", comments)
-                            .replace("{GROUP_NAME}", common.escape(gname))
-                            .replace("{GROUP_ID}", gname)
-                            .replace("{DELETE}", deleteBtn)
-                            .replace("{COMMENTS_COUNT}", item.comments_count)
-                            //.replace("{COLOR}", item.color)
-                            .replace("{TIMES_CLICKED}", item.times_clicked)
-                            .replace(
-                                "{CREATED_AT}",
-                                moment(item.created_at)
-                                    .add(moment().utcOffset(), "minutes")
-                                    .fromNow()
-                            );
-                        html += item;
-                    });
+                    var html = this.getItemMarkup(handle, data, uid);
 
                     if (updateType === "append") {
-                        $(handle + " ul.chat").append(html);
+                        $(handle + " ul.items").append(html);
                     } else if (updateType === "prepend") {
-                        $(handle + " ul.chat").prepend(html);
+                        $(handle + " ul.items").prepend(html);
                     } else if (updateType === "html") {
-                        $(handle + " ul.chat").html(html);
+                        $(handle + " ul.items").html(html);
                     }
-                    common.lazyLoadImages($(handle + " ul.chat .lazy"));
+                    common.lazyLoadImages($(handle + " ul.items .lazy"));
 
                     if (typeof callback === "function") {
                         callback(html);
@@ -112,6 +66,87 @@ module.exports = new function() {
                 });
             });
         }
+    };
+
+    this.getItem = (item_id, uid, callback) => {
+        var group = storage.getItem("defaultGroup");
+        if (group) {
+            auth.getUserId(chrome_id => {
+                const params = {
+                    handle: "itemId",
+                    chrome_id: chrome_id,
+                    group: group,
+                    item_id: item_id,
+                    action: "readTracks"
+                };
+                let data = common.getDataString(params);
+                request.get(data, items => {
+                    if (items.length === 0) {
+                        //some problem occured.
+                    } else {
+                        var html = this.getItemMarkup(
+                            "notification",
+                            items,
+                            uid
+                        );
+                        if (typeof callback == "function") {
+                            callback(html, items.rows[0].title);
+                        }
+                    }
+                });
+            });
+        }
+    };
+    this.getItemMarkup = (handle, data, uid) => {
+        var html = "";
+        var existingItemsCount = $(handle + " .item").length;
+        data.rows.forEach((item, idx) => {
+            let $html = $("#item-template").clone();
+
+            let comments = item.comments === null ? "" : item.comments;
+
+            let thumbnail = item.thumbnail;
+
+            if (item.thumbnail == "" || item.thumbnail == null) {
+                thumbnail = "assets/weed.jpg";
+            }
+
+            var gname = handle == "#wall" ? "" : `[${item.name}]`;
+
+            var favourite =
+                item.favourite == "1"
+                    ? "glyphicon-star"
+                    : "glyphicon-star-empty";
+
+            var deleteBtn = item.uid == uid ? "Delete" : "";
+
+            var item = $html
+                .html()
+                .replace("{NICKNAME}", common.escape(item.nickname))
+                .replace("{SRNO}", ++existingItemsCount)
+                .replace("{STAR}", favourite)
+                .replace("{THUMB}", thumbnail)
+                .replace("{ITEM_ID}", item.id)
+                .replace("{USER_ID}", item.uid)
+                .replace("{TITLE}", common.escape(item.title))
+                .replace("{URL}", common.escape(item.url))
+                .replace("{COMMENTS}", comments)
+                .replace("{GROUP_NAME}", common.escape(gname))
+                .replace("{GROUP_ID}", gname)
+                .replace("{DELETE}", deleteBtn)
+                .replace("{COMMENTS_COUNT}", item.comments_count)
+                //.replace("{COLOR}", item.color)
+                .replace("{TIMES_CLICKED}", item.times_clicked)
+                .replace("{LIKES_COUNT}", item.likes_count)
+                .replace(
+                    "{CREATED_AT}",
+                    moment(item.created_at)
+                        .add(moment().utcOffset(), "minutes")
+                        .fromNow()
+                );
+            html += item;
+        });
+        return html;
     };
     /**
      * Publish a new Item
@@ -152,11 +187,8 @@ module.exports = new function() {
 
                     request.post(data, function(data) {
                         if (data.flag) {
-                            if (group == defaultGroup) {
-                                $('a[data-target="#wall"]').click();
-                            } else {
-                                $('a[data-target="#updates"]').click();
-                            }
+                            _group.makeGroupDefault("#add-item #groups-dd");
+                            $('a[data-target="#wall"]').click();
                             $("#add-item input").val("");
                         } else {
                             message.show(data.msg, "Sorry");
@@ -173,8 +205,9 @@ module.exports = new function() {
     };
 
     this.itemClicked = e => {
-        $handle = $(e.target).parents(".item");
-        var item_id = $handle.data("id");
+        e.preventDefault();
+        var $handle = $(e.target).parents(".item");
+        var item_id = $handle.attr("data-id");
 
         auth.getUserId(function(chrome_id) {
             var params = {
@@ -182,11 +215,10 @@ module.exports = new function() {
                 action: "itemClicked",
                 item_id: item_id
             };
-            var data = main.getDataString(params);
-            main.bgPage.sendClickedStat(data);
-            // request.post(data, function(){
-
-            // });
+            var bgPage = chrome.extension.getBackgroundPage();
+            var data = common.getDataString(params);
+            bgPage.sendClickedStat(data);
+            window.open($(e.target).attr("href"));
         });
     };
 

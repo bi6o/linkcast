@@ -3,6 +3,11 @@
  * @author - Abhishek Saha
  * @description - This is the main engine that takes care of everything
  * ======================================================================== */
+window.$ = require("jquery");
+window.jQuery = $;
+require("bootstrap");
+window.moment = require("moment");
+
 const storage = require("./popup/storage");
 const request = require("./popup/request");
 const common = require("./common/common");
@@ -11,6 +16,8 @@ const group = require("./popup/group");
 const user = require("./popup/user");
 const auth = require("./popup/auth");
 const comments = require("./popup/comments");
+const likes = require("./popup/likes");
+const notification = require("./popup/notification");
 
 var plugin = () => {
     /**
@@ -53,12 +60,12 @@ var plugin = () => {
                     /* If user does not exist or not logged in show settings tab */
                     $('a[data-target="#settings"]').click();
                     $("#loader").remove();
-
+                    $(".authorized").addClass("hide");
                     /*The wall and update tab should show a message asking the user what to do*/
                     group.groupNotSetMessage();
                 } else {
                     main._detectSite();
-
+                    $(".authorized").removeClass("hide");
                     user.info = result.data;
 
                     item.fetchItems("#wall", "html", null);
@@ -76,11 +83,11 @@ var plugin = () => {
                     );
 
                     /* Show notifications */
-                    main._updateNotificationCount();
-                    main.noticationIntervalTimer = setInterval(
-                        main._updateNotificationCount,
-                        2000
-                    );
+                    notification.getNotifications();
+                    // main.noticationIntervalTimer = setInterval(
+                    //     main._updateNotificationCount,
+                    //     2000
+                    // );
                 }
             });
         },
@@ -105,9 +112,24 @@ var plugin = () => {
             $(document).on("click", ".delete-item", item.deleteItem);
             $(document).on("click", ".comments-item", comments.showComments);
             $(document).on("click", ".item-link", item.itemClicked);
+            $(document).on("click", ".likes-item", likes.likeClicked);
             $(document).on("click", ".forward-item", item.itemForward);
             $("#settings #groups-dd").on("change", group.groupDDChanged);
-
+            $("#linkcast-web").click(function(e) {
+                e.preventDefault();
+                var link = `chrome-extension://${chrome.runtime.id}/popup.html`;
+                window.open(link);
+            });
+            $(document).on("click", ".title", e => {
+                e.preventDefault();
+                var item_id = $(e.target).data("id");
+                item.getItem(item_id, user.info.id, (html, title) => {
+                    $("#item-modal .items").html(html);
+                    $("#item-modal .modal-title").html(title);
+                    common.lazyLoadImages($("#item-modal .items .lazy"));
+                    $("#item-modal").modal();
+                });
+            });
             $(document).on(
                 "keyup",
                 ".comment-input",
@@ -126,7 +148,7 @@ var plugin = () => {
                 $("#edit-group").removeClass("hide");
                 $(".editgroup-block").addClass("hide");
             });
-            $("#settings").on("click", "#logout", self._logout);
+            $("#settings").on("click", "#logout", auth.logout);
             $(document).on("click", "#group-visibility .radio", e => {
                 var visibility = $(e.target).val();
                 if (visibility == "0") {
@@ -182,22 +204,11 @@ var plugin = () => {
         setTheme: () => {
             var theme = storage.getItem("theme");
             if (theme != null) {
-                $("#theme").attr("href", "css/bs." + theme + ".css");
+                $("#theme").attr("href", "css/themes/" + theme + ".css");
                 $("body").removeAttr("class").addClass(theme);
             }
         },
-        /**
-         * Logout a user
-         */
-        _logout: () => {
-            //Remove all information from the local store.
-            storage.clearAll();
-            storage.setItem("loggedOut", true);
-            $(".status").html("");
-            $(".step1").show();
-            $("#groups-dd").html("<option value='0'>Select</option>");
-            $("#group-display").html("");
-        },
+
         /**
          * Triggers when a tab is changed
          * @param  {event}
@@ -207,7 +218,7 @@ var plugin = () => {
             var target = $(e.target).data("target"); // activated tab
             item.page = 1;
 
-            $("ul.chat").html('<div id="loader" class="cssload-aim"></div>');
+            $("ul.items").html('<div id="loader" class="cssload-aim"></div>');
 
             user.userExist(result => {
                 if (!result.flag) {
@@ -223,6 +234,8 @@ var plugin = () => {
 
                     if (targets.indexOf(target) !== -1) {
                         item.fetchItems(target, "html", null);
+                    } else if (target === "#notifications") {
+                        notification.getNotifications();
                     } else if (target === "#about") {
                         main._getRandomQuote();
                     } else if (target === "#settings") {
@@ -308,31 +321,28 @@ var plugin = () => {
          */
         _updateNotificationCount: () => {
             main.bgPage.getNotificationCount(data => {
-                if (parseInt(data.wallCount) > 0) {
-                    $("#wall-count").text("(" + data.wallCount + ")");
-                    item.fetchItems("#wall", "prepend", data.wallCount, null);
-                    main._resetNotification();
-                }
-                if (parseInt(data.updateCount) > 0) {
-                    $("#update-count").text("(" + data.updateCount + ")");
-                    item.fetchItems(
-                        "#updates",
-                        "prepend",
-                        data.updateCount,
-                        null
-                    );
-                    main._resetNotification();
-                }
-                if (parseInt(data.commentCount) > 0) {
-                    $("#comment-count").text("(" + data.commentCount + ")");
-                    item.fetchItems(
-                        "#updates",
-                        "prepend",
-                        data.commentCount,
-                        null
-                    );
-                    main._resetNotification();
-                }
+                let $html = $("#notification-template").clone();
+
+                var items = data.rows.map(item => {
+                    return $html
+                        .html()
+                        .replace("{ITEM_ID}", item.item_id)
+                        .replace("{ITEM}", item.template)
+                        .replace(
+                            "{CREATED_AT}",
+                            moment(item.created_at)
+                                .add(moment().utcOffset(), "minutes")
+                                .fromNow()
+                        );
+                });
+                notification.fetchNotifications(
+                    "#notifications",
+                    "prepend",
+                    null,
+                    null
+                );
+
+                $("#notifications ul.items").html(items);
             });
         },
 

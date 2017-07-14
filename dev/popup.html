@@ -3,8 +3,10 @@
 
 <head>
     <title>LinkCast</title>
-    <link rel="stylesheet" id="theme" href="css/bs.dark.css" type="text/css"></link>
+    <link rel="stylesheet" href="css/bootstrap.css" type="text/css"></link>
     <link href="css/style.css" rel="stylesheet" type="text/css"></link>
+    <link href="css/themes/dark.css" id="theme" rel="stylesheet" type="text/css"></link>
+    <link rel="stylesheet" href="css/font-awesome.min.css">
 </head>
 
 <body>
@@ -12,27 +14,34 @@
         <div id="msg" class="hide"></div>
         <div class="home">
             <ul class="nav nav-tabs" id="myTab">
-                <li class="active"><a data-target="#wall" data-toggle="tab">Wall <span id="wall-count"></span></a></li>
-                <li><a data-target="#updates" data-toggle="tab">Updates <span id="update-count"></span></a></li>
-                <li><a data-target="#favourites" data-toggle="tab">Favourites</a></li>
-                <li><a data-target="#user-links" data-toggle="tab">My links</a></li>
-                <li><a data-target="#add-item" data-toggle="tab">Add Link</a></li>
+                <li class="active"><a data-target="#notifications" data-toggle="tab">Notifications <span id="noti-count"></span></a></li>
+                <li class="authorized"><a data-target="#wall" data-toggle="tab">Wall <span id="wall-count"></span></a></li>
+                <!--<li><a data-target="#updates" data-toggle="tab">Updates <span id="update-count"></span></a></li>-->
+                <li class="authorized"><a data-target="#favourites" data-toggle="tab">Favourites</a></li>
+                <li class="authorized"><a data-target="#user-links" data-toggle="tab">My links</a></li>
+                <li class="authorized"><a data-target="#add-item" data-toggle="tab">Add Link</a></li>
                 <li><a data-target="#settings" data-toggle="tab">Settings</a></li>
                 <li><a data-target="#about" data-toggle="tab">About</a></li>
             </ul>
             <div class="tab-content">
-                <div class="tab-pane active" id="wall">
+                <div class="tab-pane active" id="notifications">
                     <div class="panel panel-primary">
-                        <div class="panel-body">
-                            <ul class="chat">
+                        <div class="panel-body main-panel">
+                            <ul class="items">
+                                <div id="loader" class="cssload-aim"></div>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane" id="wall">
+                    <div class="panel panel-primary">
+                        <div class="panel-body main-panel">
+                            <ul class="items">
                                 <div id="loader" class="cssload-aim"></div>
                             </ul>
                         </div>
                         <div class="panel-footer">
-                            <!-- <div class="input-group">
-                                <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..."> <span class="input-group-btn"><button class="btn btn-warning btn-sm" id="btn-chat">
-                                Send</button> </span>
-                            </div> -->
                             <div class="pull-left">
                                 Connected to Group: <strong id="group-display">-</strong>
                             </div>
@@ -47,8 +56,8 @@
                 </div>
                 <div class="tab-pane" id="updates">
                     <div class="panel panel-primary">
-                        <div class="panel-body">
-                            <ul class="chat">
+                        <div class="panel-body main-panel">
+                            <ul class="items">
                                 <div id="loader" class="cssload-aim"></div>
                             </ul>
                         </div>
@@ -59,8 +68,8 @@
                 </div>
                 <div class="tab-pane" id="comments">
                     <div class="panel panel-primary">
-                        <div class="panel-body">
-                            <ul class="chat">
+                        <div class="panel-body main-panel">
+                            <ul class="items">
                                 <div id="loader" class="cssload-aim"></div>
                             </ul>
                         </div>
@@ -71,31 +80,32 @@
                 </div>
                 <div class="tab-pane" id="favourites">
                     <div class="panel panel-primary">
-                        <div class="panel-body">
-                            <ul class="chat">
+                        <div class="panel-body main-panel">
+                            <ul class="items">
                                 <div id="loader" class="cssload-aim"></div>
                             </ul>
                         </div>
                         <div class="panel-footer">
-                            Your gold treasure
+
                         </div>
                     </div>
                 </div>
                 <div class="tab-pane" id="user-links">
+                    <div>abc</div>
                     <div class="panel panel-primary">
-                        <div class="panel-body">
-                            <ul class="chat">
+                        <div class="panel-body main-panel">
+                            <ul class="items">
                                 <div id="loader" class="cssload-aim"></div>
                             </ul>
                         </div>
                         <div class="panel-footer">
-                            Your gold treasure
+
                         </div>
                     </div>
                 </div>
                 <div class="tab-pane" id="add-item">
                     <div class="panel panel-primary">
-                        <div class="panel-body">
+                        <div class="panel-body main-panel">
                             <div class="form-group">
                                 <label for="email">Name:</label>
                                 <input type="text" class="form-control" id="item-name">
@@ -120,26 +130,28 @@
                 </div>
                 <div class="tab-pane" id="about">
                     <div class="panel panel-primary">
-                        <div class="panel-body">
+                        <div class="panel-body main-panel">
                             Linkcast v<span class="version"></span>
                             <p/>
+                            <p>Web Linkcast: <a href="" id="linkcast-web">Click here</a></p>
+
                             <p/>
                             <p/>
                             <span id="random_quote"></span>
-                            <div style="position:absolute;bottom: 32px;">For any bugs, log them <a target="_blank" href="https://github.com/ajaxtown/linkcast/issues">here</a></div>
+                            <div style="position:absolute;bottom: 42px;">For any bugs, log them <a target="_blank" href="https://github.com/ajaxtown/linkcast/issues">here</a></div>
                         </div>
                     </div>
                 </div>
                 <div class="tab-pane" id="settings">
                     <div class="panel panel-primary">
-                        <div class="panel-body">
+                        <div class="panel-body main-panel">
                             <div class="tabs-left vertical-tabs">
                                 <ul class="nav nav-tabs">
-                                    <li class="active"><a data-target="#tab-auth" data-toggle="tab">Auth</a></li>
-                                    <li><a data-target="#tab-create-group" data-toggle="tab">Create Group</a></li>
-                                    <li><a data-target="#tab-public-group" data-toggle="tab">Public Groups</a></li>
-                                    <li><a data-target="#tab-private-group" data-toggle="tab">Private Groups</a></li>
-                                    <li><a data-target="#tab-manage-group" data-toggle="tab">Manage Group</a></li>
+                                    <li class="active"><a data-target="#tab-auth" data-toggle="tab">Profile</a></li>
+                                    <li class="authorized"><a data-target="#tab-create-group" data-toggle="tab">Create Group</a></li>
+                                    <li class="authorized"><a data-target="#tab-public-group" data-toggle="tab">Public Groups</a></li>
+                                    <li class="authorized"><a data-target="#tab-private-group" data-toggle="tab">Private Groups</a></li>
+                                    <li class="authorized"><a data-target="#tab-manage-group" data-toggle="tab">Manage Group</a></li>
                                     <li><a data-target="#tab-customize" data-toggle="tab">Customization</a></li>
                                 </ul>
                                 <div class="tab-content">
@@ -161,10 +173,13 @@
                                         <div class="step step2">
                                             <div class="row">
                                                 <div class="col-xs-12 form-group">
-                                                    <label>Create a new group:</label>
+                                                    <p class="panel-info">You can create a public group which is visible to all users. Any body
+                                                        will be able to join and see the links being shared. For privacy,
+                                                        you can create a private group.</p>
+                                                    <label>Group Name:</label>
                                                     <input placeholder="Group name" type="text" id="group_name" class="form-control">
                                                     <br>
-                                                    <label>Enter a group Description:</label>
+                                                    <label>Group Description:</label>
                                                     <textarea id="group_desc" placeholder="eg. Enjoy the best selected tracks of progressive trance. Join & Contribute." class="form-control"></textarea>
                                                     <br>
                                                     <div>
@@ -199,6 +214,8 @@
                                         <div class="step">
                                             <div class="row">
                                                 <div class="col-xs-12 form-group">
+                                                    <p class="panel-info">These are the public group. You can join and start posting links if you
+                                                        have the permission.</p>
                                                     <table class="table table-hover" id="join-groups-table">
                                                         <thead>
                                                             <tr>
@@ -219,12 +236,12 @@
                                         <div class="step">
                                             <div class="row">
                                                 <div class="col-xs-12 form-group">
-                                                    <label>Join a group:</label>
+                                                    <p class="panel-info">Join a private group if you know the group name and the password</p>
+                                                    <label>Group Name:</label>
                                                     <input placeholder="Group name" type="text" id="group_name" class="form-control" />
                                                     <br>
-                                                    <label>Enter a password:</label>
+                                                    <label>Group Password:</label>
                                                     <input placeholder="Group password" type="password" id="group_password" class="form-control" />
-                                                    <p class="help-block">Private groups require a password to join</p>
                                                     <br>
                                                     <button type="submit" id="join-group" class="actionBtn btn btn-default btn-sm">Join Group</button>
                                                 </div>
@@ -235,11 +252,11 @@
                                         <div class="step">
                                             <div class="row">
                                                 <div class="col-xs-12 form-group">
+                                                    <p class="panel-info">You can manage the groups for which are you are the admin.</p>
                                                     <label>Your Groups:</label>
                                                     <select id="groups-dd" class="form-control">
                                                     </select>
                                                     <br>
-                                                    <button type="submit" id="default-group" class="actionBtn btn btn-default btn-sm">Make Default</button>
                                                     <div class="editgroup-block well hide">
                                                         <div id="editgroup-wrapper"></div>
                                                         <button data-action="edit" type="submit" id="edit-group-save-btn" class="btn btn-default btn-sm">Save</button>
@@ -315,12 +332,37 @@
             </div>
         </div>
     </div>
+    <div id="item-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h6 class="modal-title"></h6>
+                </div>
+                <div class="modal-body">
+                    <div class="panel panel-primary">
+                        <div class="panel-body">
+                            <ul class="items">
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-primary btn-sm">Ok</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
     </div>
     <div class="hide" id="item-template">
         <li class="left clearfix item" data-id="{ITEM_ID}" data-uid="{USER_ID}">
-            <span class="chat-img pull-left"><span class="favourite glyphicon {STAR}"></span><img class="lazy" width="60"
+            <span class="items-img pull-left"><span class="favourite glyphicon {STAR}"></span><img class="lazy" width="60"
                 src="assets/default.png" data-src="{THUMB}"></span>
-            <div class="chat-body clearfix">
+            <div class="items-body clearfix">
                 <div class="header">
                     <strong class="primary-font" style="color:{COLOR}">{NICKNAME}</strong> <span class="gname">{GROUP_NAME}</span>
                     <small class="pull-right text-muted">
@@ -330,10 +372,24 @@
                 <p><a href="{URL}" target="_blank" class="item-link">{TITLE}</a></p>
                 <p><i class="item-comments green">{COMMENTS}</i></p>
                 <p>
-                    <a href="#" class="grey forward-item">Forward</a>&nbsp;
-                    <a href="#" class="grey comments-item">Comments({COMMENTS_COUNT})</a>&nbsp;
-                    <a class="grey">Opened({TIMES_CLICKED})</a>&nbsp;
-                    <a href="#" class="delete-item grey">{DELETE}</a>
+                    <a href="#" class="grey likes-item action-links">
+                        <i class="fa fa-heart-o" aria-hidden="true"></i>
+                        <span class="term">{LIKES_COUNT}</span>
+                    </a>
+                    <a href="#" class="grey comments-item action-links">
+                        <i class="fa fa-comments" aria-hidden="true"></i>
+                        <span class="term">{COMMENTS_COUNT}</span>
+                    </a>
+                    <a href="#" class="grey forward-item action-links">
+                        <i class="fa fa-share" aria-hidden="true"></i>
+                    </a>
+                    <a class="grey action-links">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        <span class="term">{TIMES_CLICKED}</span>
+                    </a>
+                    <a href="#" class="delete-item grey action-links">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </a>
                 </p>
                 <div class="comments-section hide">
                     <div class="comment-wrapper">
@@ -365,11 +421,15 @@
             </span>
         </div>
     </div>
-
-    <script src="js/lib/jquery.js"></script>
-    <script src="js/lib/bootstrap.js"></script>
-    <script src="js/lib/moment.js"></script>
-    <script src="app.entry.js"></script>
+    <div class="hide" id="notification-template">
+        <div class="notification-item clearfix" data-id="{ITEM_ID}">
+            {ITEM}
+            <span class="comment-meta">
+                <span class="comment-date grey">{CREATED_AT}</span>
+            </span>
+        </div>
+    </div>
+    <script async src="app.entry.js"></script>
 </body>
 
 </html>

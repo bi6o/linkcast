@@ -14,7 +14,7 @@ module.exports = new function() {
                     storage.setItem("loggedIn", true);
                     storage.setItem("chrome_id", data.chrome_id);
                     chrome.storage.sync.set({ userid: data.chrome_id });
-
+                    $(".authorized").removeClass("hide");
                     if (typeof callback === "function") {
                         callback(data);
                     }
@@ -35,7 +35,7 @@ module.exports = new function() {
                     storage.setItem("nickname", params.nickname);
                     storage.setItem("loggedIn", true);
                     storage.setItem("chrome_id", data.chrome_id);
-
+                    $(".authorized").removeClass("hide");
                     if (typeof callback === "function") {
                         callback(data);
                     }
@@ -44,6 +44,20 @@ module.exports = new function() {
                 }
             });
         }
+    };
+
+    /**
+     * Logout a user
+     */
+    this.logout = () => {
+        //Remove all information from the local store.
+        $(".authorized").addClass("hide");
+        storage.clearAll();
+        storage.setItem("loggedOut", true);
+        $(".status").html("");
+        $(".step1").show();
+        $("#groups-dd").html("<option value='0'>Select</option>");
+        $("#group-display").html("");
     };
     /**
      * Checks if the user id exist. If not, it assigns a new user id

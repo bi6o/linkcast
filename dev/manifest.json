@@ -2,8 +2,8 @@
     "manifest_version": 2,
     "short_name": "Link-Cast",
     "name": "LinkCast",
-    "description": "Share links with your friends, create groups, get instant updates from subscribed groups, mark links as your favourites.",
-    "version": "8.2",
+    "description": "Social Networking with links",
+    "version": "9.3",
     "icons": {
         "128": "assets/icon128.png",
         "48": "assets/icon48.png",
@@ -15,12 +15,12 @@
         "default_popup": "popup.html"
     },
     "background": {
-        "scripts": ["js/lib/jquery.js", "js/background.js"]
+        "scripts": ["js/background.js"]
     },
     "content_scripts": [
         {
             "matches": ["https://*/*", "http://*/*"],
-            "js": ["js/lib/jquery.js", "js/content.js"],
+            "js": ["js/content.js"],
             "run_at": "document_end"
         }
     ],

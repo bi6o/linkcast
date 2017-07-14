@@ -12,42 +12,56 @@ module.exports = new function() {
                 action: "fetchUserGroups"
             };
             var data = common.getDataString(params);
-            request.get(data, data => {
-                var defaultGroup = storage.getItem("defaultGroup");
+            var groups = {
+                all: "<option value='0'>All</option>",
+                withPostAccess: "",
+                admin: ""
+            };
 
+            request.get(data, data => {
                 var html = "<option value='0'>Select</option>";
 
                 data.forEach(item => {
-                    var adminText = "";
-                    var admin = false;
-                    if (item.admin === item.uid) {
-                        adminText = "(admin)";
-                        admin = true;
+                    let options = this.getGroupsTemplate(item);
+                    if (item.group_rights == "can_post") {
+                        groups.withPostAccess += options;
                     }
-                    var selected =
-                        defaultGroup === item.gid ? " selected " : "";
-                    html += `<option
-                                    data-desc="${item.desc}"
-                                    is_public="${item.is_public}"
-                                    group_rights="${item.group_rights}"
-                                    admin-id="${item.admin}"
-                                    name="${item.gname}"
-                                    admin="${admin}"
-                                    ${selected}
-                                    value="${item.gid}"
-                                >
-                                    ${item.gname}
-                                    ${adminText}
-                                </option>`;
+                    if (item.admin === item.uid) {
+                        groups.admin += options;
+                    }
+                    groups.all += options;
                 });
-                $(
-                    "#settings #groups-dd,#add-item #groups-dd,#wall #groups-dd"
-                ).html(html);
+                $("#wall #groups-dd").html(groups.all);
+                $("#add-item #groups-dd").html(groups.withPostAccess);
+                $("#settings #groups-dd").html(groups.admin);
                 this.groupDDChanged();
             });
         });
     };
+    this.getGroupsTemplate = item => {
+        var admin = false;
+        var defaultGroup = storage.getItem("defaultGroup");
+        var selected = defaultGroup === item.gid ? " selected " : "";
+        var adminText = "";
 
+        if (item.admin === item.uid) {
+            adminText = "(admin)";
+            admin = true;
+        }
+        return `<option
+                        data-desc="${item.desc}"
+                        is_public="${item.is_public}"
+                        group_rights="${item.group_rights}"
+                        admin-id="${item.admin}"
+                        name="${item.gname}"
+                        admin="${admin}"
+                        ${selected}
+                        value="${item.gid}"
+                    >
+                        ${item.gname}
+                        ${adminText}
+                    </option>`;
+    };
     this.createEditGroup = e => {
         var mode = $(e.target).data("action");
 
@@ -78,6 +92,10 @@ module.exports = new function() {
                 params.password = $(
                     "#settings .tab-pane.active #group-private #group-password"
                 ).val();
+                if (params.password.trim().length == 0) {
+                    message.show("Please enter a password", "Error");
+                    return;
+                }
             }
 
             var data = common.getDataString(params);
@@ -182,15 +200,11 @@ module.exports = new function() {
     };
     this.makeGroupDefault = selector => {
         var defaultGroup = $(selector).val();
-        if (defaultGroup != "0") {
-            var name = $(selector).find("option:selected").text();
-            storage.setItem("defaultGroup", defaultGroup);
-            storage.setItem("defaultGroupName", name);
-            message.show("Default group set to " + name, "Success");
-            $("#group-display").html(storage.getItem("defaultGroupName"));
-        } else {
-            message.show("Select a group", "Error");
-        }
+        var name = $(selector).find("option:selected").text();
+        storage.setItem("defaultGroup", defaultGroup);
+        storage.setItem("defaultGroupName", name);
+        message.show("Default group set to " + name, "Success");
+        $("#group-display").html(storage.getItem("defaultGroupName"));
     };
 
     this.groupDDChanged = () => {
@@ -273,11 +287,10 @@ module.exports = new function() {
      */
     this.groupNotSetMessage = () => {
         if (storage.getItem("defaultGroup") === null) {
-            $("#wall ul.chat").html(
-                "- Login/register to get started<br>- Create a new group or select a group as default<br>- Items from Default group will be displayed here"
-            );
-            $("#updates ul.chat").html(
-                "- Login/register to get started<br>- Updates from Non-Default groups will be displayed here."
+            $(
+                "#wall ul.items,#notifications ul.items,#favourites ul.items,#user-links ul.items"
+            ).html(
+                "- Login/register to get started<br>- You will automatically be a part of Global group. You can manage your groups from settings. <br>- All links will be displayed in a tab called <b>Wall</a>"
             );
         }
     };
@@ -332,8 +345,8 @@ module.exports = new function() {
             .html($markup.html())
             .removeClass("hide");
 
-        $handle = $("#editgroup-wrapper");
-        $option = $("#tab-manage-group #groups-dd option:selected");
+        let $handle = $("#editgroup-wrapper");
+        let $option = $("#tab-manage-group #groups-dd option:selected");
 
         //update group name
         $handle

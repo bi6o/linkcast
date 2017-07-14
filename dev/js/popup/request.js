@@ -1,6 +1,5 @@
 const storage = require("./storage");
-const config = require("../../../config");
-debugger;
+const config = require("../../config");
 const request = new function() {
     this._sendRequest = (type, data, callback) => {
         $.ajax({
@@ -12,7 +11,7 @@ const request = new function() {
             success: callback,
             error: function(jXHR) {
                 if (jXHR.status != 200) {
-                    $(".chat").html(
+                    $(".items").html(
                         "Hey " +
                             storage.getItem("nickname") +
                             ", wait, server is busy :( Please try after sometime!"
