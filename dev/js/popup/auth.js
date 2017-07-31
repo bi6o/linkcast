@@ -13,13 +13,14 @@ module.exports = new function() {
                     storage.setItem("nickname", params.nickname);
                     storage.setItem("loggedIn", true);
                     storage.setItem("chrome_id", data.chrome_id);
+
                     chrome.storage.sync.set({ userid: data.chrome_id });
                     $(".authorized").removeClass("hide");
                     if (typeof callback === "function") {
                         callback(data);
                     }
                 } else {
-                    message.show(data.msg, "Error");
+                    message.show(data.msg, "warning");
                 }
             });
         }
@@ -32,6 +33,7 @@ module.exports = new function() {
 
             request.post(data, data => {
                 if (data.flag) {
+                    storage.setEmptyItems();
                     storage.setItem("nickname", params.nickname);
                     storage.setItem("loggedIn", true);
                     storage.setItem("chrome_id", data.chrome_id);
@@ -40,7 +42,7 @@ module.exports = new function() {
                         callback(data);
                     }
                 } else {
-                    message.show(data.msg, "Error");
+                    message.show(data.msg, "warning");
                 }
             });
         }

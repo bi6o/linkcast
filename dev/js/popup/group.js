@@ -31,9 +31,9 @@ module.exports = new function() {
                     }
                     groups.all += options;
                 });
-                $("#wall #groups-dd").html(groups.all);
-                $("#add-item #groups-dd").html(groups.withPostAccess);
-                $("#settings #groups-dd").html(groups.admin);
+                $("#tab-feed #groups-dd").html(groups.all);
+                $("#tab-post #groups-dd").html(groups.withPostAccess);
+                $("#tab-groups #groups-dd").html(groups.admin);
                 this.groupDDChanged();
             });
         });
@@ -66,10 +66,12 @@ module.exports = new function() {
         var mode = $(e.target).data("action");
 
         auth.getUserId(chrome_id => {
-            var name = $("#settings .tab-pane.active #group_name").val();
-            var desc = $("#settings .tab-pane.active #group_desc").val();
+            var name = $(
+                "#tab-groups .tab-pane.active #inputGroupCreate"
+            ).val();
+            var desc = $("#tab-groups .tab-pane.active  #inputGrpDesc").val();
             var is_public = $(
-                "#settings .tab-pane.active #group-visibility .radio:checked"
+                "#tab-groups .tab-pane.active  #group-visibility .radio:checked"
             ).val();
 
             var params = {
@@ -80,20 +82,22 @@ module.exports = new function() {
                 mode: mode,
                 name: name,
                 group_rights: $(
-                    "#settings .tab-pane.active #group-rights .radio:checked"
+                    "#tab-groups .tab-pane.active  #group-rights .radio:checked"
                 ).val()
             };
 
             if (mode == "edit") {
-                params.gid = $("#settings #groups-dd option:selected").val();
+                params.gid = $(
+                    "#tab-groups .tab-pane.active  #groups-dd option:selected"
+                ).val();
             }
             //if group is public, find other options
-            if (is_public == "0") {
+            if (is_public == "0" && mode == "create") {
                 params.password = $(
-                    "#settings .tab-pane.active #group-private #group-password"
+                    "#tab-groups .tab-pane.active  #group-private #group-password"
                 ).val();
                 if (params.password.trim().length == 0) {
-                    message.show("Please enter a password", "Error");
+                    message.show("Please enter a password", "warning");
                     return;
                 }
             }
@@ -101,18 +105,18 @@ module.exports = new function() {
             var data = common.getDataString(params);
 
             if (name == "") {
-                message.show("Please enter a groupname. Noob!", "Error");
+                message.show("Please enter a groupname. Noob!", "warning");
             } else if (desc == "") {
-                message.show("Please enter a group description!", "Error");
+                message.show("Please enter a group description!", "warning");
             } else {
                 request.post(data, data => {
                     if (data.flag) {
-                        $("#settings .tab-pane.active #group_name").val("");
-                        message.show(data.msg, "Success");
+                        $("#tab-groups .tab-pane.active  #group_name").val("");
+                        message.show(data.msg, "success");
                         this.fetchGroups();
                         $("#edit-group-cancel-btn").click();
                     } else {
-                        message.show(data.msg, "Error");
+                        message.show(data.msg, "warning");
                     }
                 });
             }
@@ -137,9 +141,9 @@ module.exports = new function() {
                         .removeClass("group-leave red")
                         .addClass("group-join green")
                         .html("Join");
-                    message.show(data.msg, "Success");
+                    message.show(data.msg, "success");
                 } else {
-                    message.show(data.msg, "Error");
+                    message.show(data.msg, "warning");
                 }
             });
         });
@@ -162,16 +166,16 @@ module.exports = new function() {
                         .removeClass("group-join green")
                         .addClass("group-leave red")
                         .html("Leave");
-                    message.show(data.msg, "Success");
+                    message.show(data.msg, "success");
                 } else {
-                    message.show(data.msg, "Error");
+                    message.show(data.msg, "warning");
                 }
             });
         });
     };
     this.joinPrivateGroup = () => {
-        var group_name = $("#tab-private-group #group_name").val();
-        var group_password = $("#tab-private-group #group_password").val();
+        var group_name = $("#tab-private-groups #inputGroup").val();
+        var group_password = $("#tab-private-groups #grpPwd").val();
         if (group_name != "") {
             auth.getUserId(chrome_id => {
                 var params = {
@@ -184,18 +188,16 @@ module.exports = new function() {
                 // check if the group exist. If yes, join the group
                 request.post(data, data => {
                     if (data.flag) {
-                        $(
-                            "#tab-private-group #group_name, #tab-private-group #group_password"
-                        ).val("");
+                        $("#tab-private-groups input").val("");
                         this.fetchGroups();
-                        message.show(data.msg, "Success");
+                        message.show(data.msg, "success");
                     } else {
-                        message.show(data.msg, "Error");
+                        message.show(data.msg, "warning");
                     }
                 });
             });
         } else {
-            message.show("Enter a groupname. Noob!", "Error");
+            message.show("Enter a groupname. Noob!", "warning");
         }
     };
     this.makeGroupDefault = selector => {
@@ -203,15 +205,15 @@ module.exports = new function() {
         var name = $(selector).find("option:selected").text();
         storage.setItem("defaultGroup", defaultGroup);
         storage.setItem("defaultGroupName", name);
-        message.show("Default group set to " + name, "Success");
+        message.show("Default group set to " + name, "success");
         $("#group-display").html(storage.getItem("defaultGroupName"));
     };
 
     this.groupDDChanged = () => {
-        var group_id = $("#settings #groups-dd").val();
+        var group_id = $("#tab-groups #groups-dd").val();
         $(".editgroup-block").addClass("hide");
-        var isAdmin = $("#settings #groups-dd option:selected").attr("admin");
-        var admin_id = $("#settings #groups-dd option:selected").attr(
+        var isAdmin = $("#tab-groups #groups-dd option:selected").attr("admin");
+        var admin_id = $("#tab-groups #groups-dd option:selected").attr(
             "admin-id"
         );
 
@@ -219,7 +221,7 @@ module.exports = new function() {
             //allow this fellow to edit the group
             $("#edit-group").removeClass("hide");
             $("#rename-group-input").val(
-                $("#settings #groups-dd option:selected").attr("name")
+                $("#tab-manage-groups #groups-dd option:selected").attr("name")
             );
         } else {
             $("#edit-group").addClass("hide");
@@ -259,7 +261,7 @@ module.exports = new function() {
     this.removeUserFromGroup = e => {
         var $handle = $(e.target).parents(".user-item");
         var user_id = $handle.data("id");
-        var group_id = $("#settings #groups-dd").val();
+        var group_id = $("#tab-manage-groups #groups-dd").val();
 
         auth.getUserId(chrome_id => {
             var params = {
@@ -274,9 +276,9 @@ module.exports = new function() {
             request.post(data, data => {
                 if (data.flag) {
                     $handle.remove();
-                    message.show(data.msg, "Success");
+                    message.show(data.msg, "success");
                 } else {
-                    message.show(data.msg, "Error");
+                    message.show(data.msg, "warning");
                 }
             });
         });
@@ -286,11 +288,12 @@ module.exports = new function() {
      * This is usually seen if the user is not logged in
      */
     this.groupNotSetMessage = () => {
-        if (storage.getItem("defaultGroup") === null) {
+        console.log(typeof storage.getItem("defaultGroup"));
+        if (typeof storage.getItem("defaultGroup") === "undefined") {
             $(
-                "#wall ul.items,#notifications ul.items,#favourites ul.items,#user-links ul.items"
+                "#tab-feed .items,#tab-notifications .items,#tab-favourites .items,#tab-sent .items"
             ).html(
-                "- Login/register to get started<br>- You will automatically be a part of Global group. You can manage your groups from settings. <br>- All links will be displayed in a tab called <b>Wall</a>"
+                "<div id='instructions'>- Login/register to get started<br>- You will automatically be a part of Global group. You can manage your groups from settings. <br>- All links will be displayed in a tab called <b>Wall</b></div>"
             );
         }
     };
@@ -303,35 +306,49 @@ module.exports = new function() {
             };
             var data = common.getDataString(params);
 
-            request.post(data, data => {
+            request.get(data, data => {
                 var html = "";
                 data.forEach(item => {
                     var status =
                         item.status == "1"
                             ? "<a href='#' class='red group-leave'>Leave</a>"
                             : "<a href='#' class='green group-join'>Join</a>";
-                    html +=
-                        "<tr data-gid=" +
-                        item.id +
-                        "> \
-                                <td><strong>" +
-                        item.name +
-                        "</strong> <br/>" +
-                        item.desc +
-                        ".</td> \
-                                <td>" +
-                        item.group_rights +
-                        "</td> \
-                                <td>" +
-                        item.total +
-                        "</td> \
-                                <td>" +
-                        status +
-                        "</td> \
-                            </tr>";
+                    html += `<tr data-gid="${item.id}">
+                                <td>
+                                    <a href="#" class="group-name"><strong>${item.name}</strong></a>
+                                    <br/>
+                                    ${item.desc}
+                                </td>
+                                <td>
+                                    ${item.group_rights}
+                                </td>
+                                <td>
+                                    ${item.total}
+                                </td>
+                                <td>${status}</td>
+                            </tr>`;
                 });
 
-                $("#tab-public-group tbody").html(html);
+                $("#tab-public-groups .items").html(html);
+            });
+        });
+    };
+    this.getUsers = (gid, user_id, callback) => {
+        auth.getUserId(chrome_id => {
+            var params = {
+                chrome_id: chrome_id,
+                group_id: gid,
+                action: "getUsersOfGroup"
+            };
+            var data = common.getDataString(params);
+
+            request.get(data, data => {
+                var users = data.map(
+                    user =>
+                        `<a href="#" data-id="${user.id}" class="username" style="color:${user.color}">${user.nickname}</a> - ${user.bio}`
+                );
+                var html = users.join("<br/> ");
+                callback(html);
             });
         });
     };
@@ -339,38 +356,41 @@ module.exports = new function() {
     this.editGroup = e => {
         $(e.target).addClass("hide");
         $(".editgroup-block").removeClass("hide");
-        var $markup = $("#tab-create-group").clone(); //editgroup-block
+        var $markup = $("#create-group-block").clone(); //editgroup-block
         $markup.find("#create-group").remove();
+        $markup = $markup[0].innerHTML.replace(
+            /label-floating/g,
+            "label-static"
+        );
         $("div.editgroup-block #editgroup-wrapper")
-            .html($markup.html())
+            .html($markup)
             .removeClass("hide");
 
         let $handle = $("#editgroup-wrapper");
-        let $option = $("#tab-manage-group #groups-dd option:selected");
+        let $option = $("#tab-manage-groups #groups-dd option:selected");
 
         //update group name
         $handle
-            .find("#group_name")
+            .find("#inputGroupCreate")
             .val($option.text().replace("(admin)", "").trim());
-        //update group desc //saha
-        $handle.find("#group_desc").val($option.data("desc"));
+        //update group desc
+        $handle.find("#inputGrpDesc").val($option.data("desc"));
         //update private/public visibility
         $(
-            "#tab-manage-group #group-visibility .radio[value='" +
+            "#tab-manage-groups #group-visibility .radio[value='" +
                 $option.attr("is_public") +
                 "']"
-        ).attr("checked", "checked");
+        ).click();
         //update public rights
-        console.log($option.attr("group_rights"));
         $(
-            "#tab-manage-group #group-rights .radio[value='" +
+            "#tab-manage-groups #group-rights .radio[value='" +
                 $option.attr("group_rights") +
                 "']"
-        ).attr("checked", "checked");
+        ).click();
     };
     this._editGroupSave = () => {
         var group_name = $("#rename-group-input").val();
-        var group_id = $("#settings #groups-dd option:selected").val();
+        var group_id = $("#tab-manage-groups #groups-dd option:selected").val();
 
         auth.getUserId(chrome_id => {
             request.post(
@@ -384,7 +404,7 @@ module.exports = new function() {
                 data => {
                     if (data.flag) {
                         $(".editgroup-block").addClass("hide");
-                        message.show(data.msg, "Success");
+                        message.show(data.msg, "success");
                         $("#edit-group").removeClass("hide");
                         $("#groups-dd option[value='" + group_id + "']").html(
                             group_name + "(admin)"
@@ -399,7 +419,7 @@ module.exports = new function() {
                         }
                     } else {
                         //$("#edit-group").removeClass('hide');
-                        message.show(data.msg, "Error");
+                        message.show(data.msg, "warning");
                     }
                 }
             );

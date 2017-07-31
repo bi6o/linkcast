@@ -7,6 +7,8 @@ window.$ = require("jquery");
 window.jQuery = $;
 require("bootstrap");
 window.moment = require("moment");
+require("bootstrap-material-design");
+require("./color-picker");
 
 const storage = require("./popup/storage");
 const request = require("./popup/request");
@@ -48,6 +50,7 @@ var plugin = () => {
          * @return {null}
          */
         init: () => {
+            $.material.init();
             main.bgPage = chrome.extension.getBackgroundPage();
             main._addEventListeners();
             var manifest = chrome.runtime.getManifest();
@@ -58,7 +61,7 @@ var plugin = () => {
             user.userExist(result => {
                 if (!result.flag) {
                     /* If user does not exist or not logged in show settings tab */
-                    $('a[data-target="#settings"]').click();
+                    $('a[href="#tab-settings"]').click();
                     $("#loader").remove();
                     $(".authorized").addClass("hide");
                     /*The wall and update tab should show a message asking the user what to do*/
@@ -68,7 +71,7 @@ var plugin = () => {
                     $(".authorized").removeClass("hide");
                     user.info = result.data;
 
-                    item.fetchItems("#wall", "html", null);
+                    item.fetchItems("#tab-feed", "html", null);
 
                     group.fetchGroups();
                     main._activateScroll();
@@ -81,7 +84,9 @@ var plugin = () => {
                     $("#group-display").html(
                         storage.getItem("defaultGroupName")
                     );
-
+                    $("#profile-color").spectrum({
+                        color: user.info.color
+                    });
                     /* Show notifications */
                     notification.getNotifications();
                     // main.noticationIntervalTimer = setInterval(
@@ -100,11 +105,11 @@ var plugin = () => {
             $("button.register-btn").click(self.registerUser);
             $("button.login-btn").click(self.loginUser);
 
-            $("#tab-create-group #create-group").click(group.createEditGroup);
+            $("#tab-create-groups #create-group").click(group.createEditGroup);
             $("#edit-group-save-btn").click(group.createEditGroup);
             $("#join-group").click(group.joinPrivateGroup);
 
-            $("#add-item button").click(item.addItem);
+            $("#post-btn").click(item.addItem);
             $("#default-group").click(() => {
                 group.makeGroupDefault("#settings #groups-dd");
             });
@@ -114,7 +119,17 @@ var plugin = () => {
             $(document).on("click", ".item-link", item.itemClicked);
             $(document).on("click", ".likes-item", likes.likeClicked);
             $(document).on("click", ".forward-item", item.itemForward);
-            $("#settings #groups-dd").on("change", group.groupDDChanged);
+            $(document).on("click", ".item", e => {
+                if (e.target.localName !== "div") {
+                    return;
+                }
+                let link = $(e.target)
+                    .parents(".item")
+                    .find(".item-link")
+                    .attr("href");
+                window.open(link);
+            });
+            $("#tab-groups #groups-dd").on("change", group.groupDDChanged);
             $("#linkcast-web").click(function(e) {
                 e.preventDefault();
                 var link = `chrome-extension://${chrome.runtime.id}/popup.html`;
@@ -130,26 +145,80 @@ var plugin = () => {
                     $("#item-modal").modal();
                 });
             });
+            $(document).on("click", ".profile-btn", e => {
+                e.preventDefault();
+
+                let data = {
+                    nickname: $("#new-nickname").val(),
+                    color: $("#profile-color").val(),
+                    bio: $("#bio").val()
+                };
+                user.saveProfile(data, msg => {
+                    console.log(msg);
+                });
+            });
+            $(document).on("click", ".user-enabled .username", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var target_user_id = $(this).data("id");
+                $("#profile-modal").modal();
+                $("#profile-modal").attr("data-id", "");
+
+                user.getProfile(target_user_id, user.info.id, res => {
+                    $("#profile-modal .modal-title").html(
+                        `<span style="color:${res.data.color}">${res.data
+                            .nickname}</span> - ${res.data.bio}`
+                    );
+                    $("#profile-modal .groups-wrapper").html(
+                        res.groups.join(", ")
+                    );
+                    $("#profile-modal").attr("data-id", target_user_id);
+                });
+                item.getOtherUserItems(
+                    target_user_id,
+                    user.info.id,
+                    "html",
+                    response => {}
+                );
+            });
+            $(document).on("click", ".modal .username", e => {
+                e.preventDefault();
+            });
+            $(document).on("click", "a.group-name", function(e) {
+                e.preventDefault();
+                let gid = $(this).parents("tr").data("gid");
+                group.getUsers(gid, user.info.id, response => {
+                    $("#users-modal .wrapper").html(response);
+                    $("#users-modal").modal();
+                });
+            });
             $(document).on(
                 "keyup",
                 ".comment-input",
                 comments.sendComment.bind(this)
             );
 
-            $("#wall #groups-dd").on("change", () => {
-                group.makeGroupDefault("#wall #groups-dd");
-                item.fetchItems("#wall", "html", null);
+            $("#tab-feed #groups-dd").on("change", () => {
+                group.makeGroupDefault("#tab-feed #groups-dd");
+                item.fetchItems("#tab-feed", "html", null);
             });
 
-            $('a[data-toggle="tab"]').on("shown.bs.tab", self._tabChanged);
+            $('a[data-toggle="tab"],a[data-toggle="pill"]').on(
+                "shown.bs.tab",
+                self._tabChanged
+            );
 
             $("#edit-group").click(group.editGroup);
             $("#edit-group-cancel-btn").click(() => {
                 $("#edit-group").removeClass("hide");
                 $(".editgroup-block").addClass("hide");
             });
-            $("#settings").on("click", "#logout", auth.logout);
-            $(document).on("click", "#group-visibility .radio", e => {
+            $("#tab-profile").on("click", "#logout", auth.logout);
+            $(".status").on("click", "#edit-profile", e => {
+                //e.preventDefault();
+                $("#tab-profile #edit-profile").removeClass("hide");
+            });
+            $(document).on("click", "#group-visibility input", e => {
                 var visibility = $(e.target).val();
                 if (visibility == "0") {
                     $(".tab-pane.active #group-private").removeClass("hide");
@@ -168,12 +237,12 @@ var plugin = () => {
                 user.changePublicRights
             );
 
-            $("#tab-public-group").on(
+            $("#tab-public-groups").on(
                 "click",
                 ".group-join",
                 group.joinPublicGroup
             );
-            $("#tab-public-group").on(
+            $("#tab-public-groups").on(
                 "click",
                 ".group-leave",
                 group.leaveGroup
@@ -215,28 +284,36 @@ var plugin = () => {
          */
         _tabChanged: e => {
             e.preventDefault();
-            var target = $(e.target).data("target"); // activated tab
+            var target = $(e.target).attr("href"); // activated tab
             item.page = 1;
-
-            $("ul.items").html('<div id="loader" class="cssload-aim"></div>');
+            $("div.items").html(
+                '<div id="loader" class="preloader"><img src="assets/loader.svg"></div>'
+            );
 
             user.userExist(result => {
                 if (!result.flag) {
                     group.groupNotSetMessage();
                 } else {
                     const targets = [
-                        "#wall",
+                        "#tab-feed",
                         "#updates",
                         "#comments",
                         "#user-links",
-                        "#favourites"
+                        "#tab-favourites",
+                        "#tab-links",
+                        "#tab-sent"
                     ];
-
                     if (targets.indexOf(target) !== -1) {
+                        //take care of sub tabs which are default
+                        if (target === "#tab-links") {
+                            target = "#tab-favourites";
+                        }
                         item.fetchItems(target, "html", null);
-                    } else if (target === "#notifications") {
+                    } else if (target === "#tab-groups") {
+                        group.getAllPublicGroups();
+                    } else if (target === "#tab-notifications") {
                         notification.getNotifications();
-                    } else if (target === "#about") {
+                    } else if (target === "#tab-about") {
                         main._getRandomQuote();
                     } else if (target === "#settings") {
                         group.fetchGroups();
@@ -268,7 +345,7 @@ var plugin = () => {
                         }
                     } else if (target === "#add-item") {
                         group.fetchGroups();
-                    } else if (target === "#tab-public-group") {
+                    } else if (target === "#tab-public-groups") {
                         group.getAllPublicGroups();
                     } else if (target === "#tab-join-public-group") {
                         group.getAllPublicGroups();
@@ -342,28 +419,52 @@ var plugin = () => {
                     null
                 );
 
-                $("#notifications ul.items").html(items);
+                $("#notifications div.items").html(items);
             });
         },
 
         _activateScroll: () => {
-            var $panels = $(
-                "#wall .panel-body, #updates .panel-body, #favourites .panel-body, #user-links .panel-body"
+            var $windows = $(
+                "#tab-feed .scroll, #tab-sent .scroll, #tab-favourites .scroll, #user-links .panel-body"
             );
 
-            $panels.scroll(e => {
-                var height = $(e.target).innerHeight();
-                var scroll_top = $(e.target).scrollTop();
-                var scrollHeight = $(e.target)[0].scrollHeight;
+            $windows.scroll(function(e) {
+                var height = $(this).innerHeight();
+                var scroll_top = $(this).scrollTop();
+                var scrollHeight = $(this)[0].scrollHeight;
 
                 var loading = true;
-                var handle = $("#myTab .active a").data("target");
+                var window_id = "#" + $(this).parent().attr("id");
                 if (scroll_top + height == scrollHeight && loading === true) {
                     item.page++;
                     if (item.page <= item.totalPages) {
-                        item.fetchItems(handle, "append", null, html => {
+                        item.fetchItems(window_id, "append", null, html => {
                             loading = false;
                         });
+                    }
+                }
+                e.stopPropagation();
+                e.preventDefault();
+                return false;
+            });
+
+            $("#profile-modal .scroll").scroll(function(e) {
+                var height = $(this).innerHeight();
+                var scroll_top = $(this).scrollTop();
+                var scrollHeight = $(this)[0].scrollHeight;
+
+                var loading = true;
+                if (scroll_top + height == scrollHeight && loading === true) {
+                    item.userPage++;
+                    if (item.userPage <= item.totalUserPages) {
+                        item.getOtherUserItems(
+                            $("#profile-modal").attr("data-id"),
+                            user.info.id,
+                            "append",
+                            response => {
+                                loading = false;
+                            }
+                        );
                     }
                 }
                 e.stopPropagation();

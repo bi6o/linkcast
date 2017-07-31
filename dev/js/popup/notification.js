@@ -36,7 +36,7 @@ module.exports = new function() {
                 if (data.rows.length === 0) {
                     items = "No notifications yet.. But someday.";
                 }
-                $("#notifications ul.items").html(items);
+                $("#tab-notifications .items").html(items);
             });
         });
     };

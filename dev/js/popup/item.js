@@ -5,6 +5,14 @@ const common = require("../common/common");
 const message = require("./message");
 const _group = require("./group");
 
+String.prototype.replaceArray = function(find, replace) {
+    var replaceString = this;
+    for (var i = 0; i < find.length; i++) {
+        replaceString = replaceString.replace(find[i], replace[i]);
+    }
+    return replaceString;
+};
+
 module.exports = new function() {
     /**
      * Holds the current page number
@@ -12,6 +20,8 @@ module.exports = new function() {
      */
     this.page = 1;
 
+    this.userPage = 1;
+    this.totalUserPages = 0;
     /**
      * Total number of pages available
      * @type {Number}
@@ -52,13 +62,13 @@ module.exports = new function() {
                     var html = this.getItemMarkup(handle, data, uid);
 
                     if (updateType === "append") {
-                        $(handle + " ul.items").append(html);
+                        $(handle + " div.items").append(html);
                     } else if (updateType === "prepend") {
-                        $(handle + " ul.items").prepend(html);
+                        $(handle + " div.items").prepend(html);
                     } else if (updateType === "html") {
-                        $(handle + " ul.items").html(html);
+                        $(handle + " div.items").html(html);
                     }
-                    common.lazyLoadImages($(handle + " ul.items .lazy"));
+                    common.lazyLoadImages($(handle + " div.items .lazy"));
 
                     if (typeof callback === "function") {
                         callback(html);
@@ -66,6 +76,48 @@ module.exports = new function() {
                 });
             });
         }
+    };
+
+    this.getOtherUserItems = (
+        target_user_id,
+        user_id,
+        updateType,
+        callback
+    ) => {
+        auth.getUserId(chrome_id => {
+            const params = {
+                count: 5,
+                page: this.userPage,
+                chrome_id: chrome_id,
+                target_id: target_user_id,
+                action: "getOtherUserTracks"
+            };
+            let data = common.getDataString(params);
+            request.get(data, data => {
+                $("#loader").remove();
+                var uid = storage.getItem("uid");
+                this.totalUserPages = data.pages;
+
+                if (data.rows.length === 0) {
+                    html = "Nothing found.";
+                }
+
+                var html = this.getItemMarkup("#profile-modal", data, uid);
+
+                if (updateType === "append") {
+                    $("#profile-modal div.items").append(html);
+                } else if (updateType === "prepend") {
+                    $("#profile-modal div.items").prepend(html);
+                } else if (updateType === "html") {
+                    $("#profile-modal div.items").html(html);
+                }
+                common.lazyLoadImages($("#profile-modal div.items .lazy"));
+
+                if (typeof callback === "function") {
+                    callback(html);
+                }
+            });
+        });
     };
 
     this.getItem = (item_id, uid, callback) => {
@@ -97,6 +149,29 @@ module.exports = new function() {
             });
         }
     };
+    this.timeAgo = time => {
+        let timeStr = moment(time)
+            .add(moment().utcOffset(), "minutes")
+            .fromNow();
+
+        return timeStr.replaceArray(
+            [
+                " years",
+                "a year",
+                " months",
+                "a month",
+                " days",
+                "a day",
+                " hours",
+                " an hour",
+                " minutes",
+                "a minute",
+                " seconds",
+                " second"
+            ],
+            ["y", "1y", "m", "1m", "d", "1d", "h", "h", "min", "1min", "s", "s"]
+        );
+    };
     this.getItemMarkup = (handle, data, uid) => {
         var html = "";
         var existingItemsCount = $(handle + " .item").length;
@@ -111,7 +186,7 @@ module.exports = new function() {
                 thumbnail = "assets/weed.jpg";
             }
 
-            var gname = handle == "#wall" ? "" : `[${item.name}]`;
+            var gname = localStorage.defaultGroup != 0 ? "" : item.gname;
 
             var favourite =
                 item.favourite == "1"
@@ -127,23 +202,22 @@ module.exports = new function() {
                 .replace("{STAR}", favourite)
                 .replace("{THUMB}", thumbnail)
                 .replace("{ITEM_ID}", item.id)
-                .replace("{USER_ID}", item.uid)
+                .replace(/{USER_ID}/g, item.uid)
                 .replace("{TITLE}", common.escape(item.title))
-                .replace("{URL}", common.escape(item.url))
+                .replace(/{URL}/g, common.escape(item.url))
                 .replace("{COMMENTS}", comments)
                 .replace("{GROUP_NAME}", common.escape(gname))
                 .replace("{GROUP_ID}", gname)
                 .replace("{DELETE}", deleteBtn)
                 .replace("{COMMENTS_COUNT}", item.comments_count)
-                //.replace("{COLOR}", item.color)
+                .replace(
+                    "{LIKE_ICON}",
+                    item.likes_count > 0 ? "heart" : "heart-o"
+                )
+                .replace("{COLOR}", item.color)
                 .replace("{TIMES_CLICKED}", item.times_clicked)
                 .replace("{LIKES_COUNT}", item.likes_count)
-                .replace(
-                    "{CREATED_AT}",
-                    moment(item.created_at)
-                        .add(moment().utcOffset(), "minutes")
-                        .fromNow()
-                );
+                .replace("{CREATED_AT}", this.timeAgo(item.created_at));
             html += item;
         });
         return html;
@@ -156,18 +230,17 @@ module.exports = new function() {
         var url = $("#item-url").val();
         var thumbnail = $("#item-thumb").val();
         var comments = $("#item-comments").val();
-        var group = $("#add-item #groups-dd").val();
-        var defaultGroup = storage.getItem("defaultGroup");
+        var group = $("#tab-post #groups-dd").val();
         var flag = 1;
 
         //Validations
         if (url == "") {
-            message.show("Enter a valid URL", "Error");
+            message.show("Enter a valid URL", "warning");
             flag = 0;
         }
 
         if (flag === 1 && title == "") {
-            message.show("Enter a Title", "Error");
+            message.show("Enter a Title", "warning");
             flag = 0;
         }
 
@@ -187,18 +260,18 @@ module.exports = new function() {
 
                     request.post(data, function(data) {
                         if (data.flag) {
-                            _group.makeGroupDefault("#add-item #groups-dd");
-                            $('a[data-target="#wall"]').click();
-                            $("#add-item input").val("");
+                            _group.makeGroupDefault("#tab-post #groups-dd");
+                            $('a[href="#tab-feed"]').click();
+                            $("#tab-post input").val("");
                         } else {
-                            message.show(data.msg, "Sorry");
+                            message.show(data.msg, "warning");
                         }
                     });
                 });
             } else {
                 message.show(
                     "Select a group as default from Settings",
-                    "Error"
+                    "warning"
                 );
             }
         }
@@ -206,6 +279,7 @@ module.exports = new function() {
 
     this.itemClicked = e => {
         e.preventDefault();
+        e.stopPropagation();
         var $handle = $(e.target).parents(".item");
         var item_id = $handle.attr("data-id");
 

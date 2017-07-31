@@ -12,11 +12,13 @@ const user = new function() {
      */
     this.welcomeUser = nickname => {
         var logout = '<a href="#" id="logout">Logout</a>';
-        var edit = '<a href="#" id="edit-uname">Edit</a>';
+        var edit = '<a href="#" id="edit-profile">Edit</a>';
         $(".status").html(
-            "Connected as <strong>" + nickname + "</strong>, " + logout
+            `Connected as <strong>${nickname}</strong>, ${edit} - ${logout}`
         );
-        $("#edit-uname-input").val(nickname);
+        $("#new-nickname").val(nickname);
+        $("#profile-color").val(this.info.color);
+        $("#bio").val(this.info.bio);
         $(".step1").hide();
     };
     /**
@@ -47,9 +49,9 @@ const user = new function() {
                 var data = common.getDataString(params);
                 request.get(data, data => {
                     if (data.flag) {
-                        message.show(data.msg, "Success");
+                        message.show(data.msg, "success");
                     } else {
-                        message.show(data.msg, "Error");
+                        message.show(data.msg, "warning");
                     }
                 });
             });
@@ -75,21 +77,63 @@ const user = new function() {
 
             request.post(data, data => {
                 if (data.flag) {
-                    message.show(data.msg, "Success");
+                    message.show(data.msg, "success");
                 } else {
-                    message.show(data.msg, "Error");
+                    message.show(data.msg, "warning");
                 }
             });
         });
     };
 
+    this.saveProfile = (params, callback) => {
+        auth.getUserId(chrome_id => {
+            params.action = "saveProfile";
+            params.chrome_id = chrome_id;
+
+            var data = common.getDataString(params);
+
+            request.post(data, response => {
+                if (response.flag == 1) {
+                    this.info.color = params.color;
+                    this.info.bio = params.bio;
+                    message.show(response.msg, "success");
+                    storage.setItem("nickname", data.nickname);
+                } else {
+                    message.show(response.msg, "warning");
+                }
+                if (typeof callback == "function") {
+                    callback();
+                }
+            });
+        });
+    };
+
+    this.getProfile = (target_id, user_id, callback) => {
+        auth.getUserId(chrome_id => {
+            var params = {
+                chrome_id: chrome_id,
+                target_id: target_id,
+                action: "getProfile"
+            };
+
+            var data = common.getDataString(params);
+
+            request.get(data, response => {
+                response.groups = response.groups.map(group => {
+                    return `<span data-id="${group.id}" class="group-item">${group.name}</span>`;
+                });
+                callback(response);
+            });
+        });
+    };
     /**
      * Check if the user exist.
      * @param  {Function} Callback function
      */
     this.userExist = callback => {
         var data = { flag: 0 };
-        if (storage.getItem("loggedIn") === null) {
+        var loggedIn = storage.getItem("loggedIn");
+        if (loggedIn !== "true") {
             callback(data);
         } else {
             //get the userid and check in the server

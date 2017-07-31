@@ -5,9 +5,15 @@ module.exports = {
      * @param  {String} Type of message Error/Success/Warning
      */
     show: (msg, type) => {
-        $("#msg").html(`<strong>${type}</strong>: ${msg}`).removeClass("hide");
+        $("#msg")
+            .html(
+                `<div class="alert alert-dismissible alert-${type}">
+                    ${msg}
+                </div>`
+            )
+            .removeClass("hide");
         setTimeout(function() {
             $("#msg").addClass("hide");
-        }, 3000);
+        }, 2000);
     }
-}
+};

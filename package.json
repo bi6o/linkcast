@@ -40,6 +40,8 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "bootstrap-material-design": "^0.5.10",
+    "color-picker": "0.0.1",
     "jquery": "^2.2.4",
     "moment": "^2.18.1"
   }

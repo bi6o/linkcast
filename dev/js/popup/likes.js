@@ -19,16 +19,16 @@ module.exports = new function() {
                 let count = parseInt(data.count);
                 if (count > 0) {
                     $handle
-                        .find(".fa")
+                        .find(".fa.heart")
                         .removeClass("fa-heart-o")
                         .addClass("fa-heart");
                 } else {
                     $handle
-                        .find(".fa")
+                        .find(".fa.heart")
                         .removeClass("fa-heart")
                         .addClass("fa-heart-o");
                 }
-                $handle.find(".term").html(data.count);
+                $handle.find(".likes").html(data.count);
             });
         });
     };

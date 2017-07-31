@@ -1,6 +1,6 @@
 module.exports = new function() {
     this.getItem = name => {
-        return localStorage.getItem(name);
+        return localStorage[name];
     };
 
     this.setItem = (name, value) => {
