@@ -37,8 +37,8 @@ var retrieveSiteMeta = function(passed_message, callback) {
 var countStore = 0;
 var countData = { rows: [], pages: 0 };
 var endpoint =
-    // "http://playground.ajaxtown.com/youtube_chrome_backend/index.php";
-"http://localhost:8000";
+    "http://playground.ajaxtown.com/youtube_chrome_backend/index.php";
+// "http://localhost:8000";
 
 function checkStorage() {
     if (typeof localStorage.richNotification === "undefined") {

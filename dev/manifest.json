@@ -3,7 +3,7 @@
     "short_name": "Link-Cast",
     "name": "LinkCast",
     "description": "Social Networking with links",
-    "version": "9.5.1",
+    "version": "9.5.2",
     "icons": {
         "128": "assets/icon128.png",
         "48": "assets/icon48.png",

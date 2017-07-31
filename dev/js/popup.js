@@ -187,8 +187,9 @@ var plugin = () => {
             $(document).on("click", "a.group-name", function(e) {
                 e.preventDefault();
                 let gid = $(this).parents("tr").data("gid");
-                group.getUsers(gid, user.info.id, response => {
-                    $("#users-modal .wrapper").html(response);
+                group.getUsers(gid, user.info.id, (html, gname) => {
+                    $("#users-modal .modal-title").html(gname);
+                    $("#users-modal .wrapper").html(html);
                     $("#users-modal").modal();
                 });
             });

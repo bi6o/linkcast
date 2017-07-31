@@ -340,15 +340,15 @@ module.exports = new function() {
                 group_id: gid,
                 action: "getUsersOfGroup"
             };
-            var data = common.getDataString(params);
+            params = common.getDataString(params);
 
-            request.get(data, data => {
+            request.get(params, data => {
                 var users = data.map(
                     user =>
                         `<a href="#" data-id="${user.id}" class="username" style="color:${user.color}">${user.nickname}</a> - ${user.bio}`
                 );
                 var html = users.join("<br/> ");
-                callback(html);
+                callback(html, data && data[0].name);
             });
         });
     };
