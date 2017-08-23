@@ -34,7 +34,7 @@ module.exports = new function() {
                 $("#tab-feed #groups-dd").html(groups.all);
                 $("#tab-post #groups-dd").html(groups.withPostAccess);
                 $("#tab-groups #groups-dd").html(groups.admin);
-                this.groupDDChanged();
+                //this.groupDDChanged();
             });
         });
     };

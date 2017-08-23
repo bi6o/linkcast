@@ -70,9 +70,8 @@ var plugin = () => {
                     main._detectSite();
                     $(".authorized").removeClass("hide");
                     user.info = result.data;
-
-                    item.fetchItems("#tab-feed", "html", null);
-
+                    /* Show notifications */
+                    notification.getNotifications();
                     group.fetchGroups();
                     main._activateScroll();
                     main._resetNotification();
@@ -87,8 +86,7 @@ var plugin = () => {
                     $("#profile-color").spectrum({
                         color: user.info.color
                     });
-                    /* Show notifications */
-                    notification.getNotifications();
+
                     // main.noticationIntervalTimer = setInterval(
                     //     main._updateNotificationCount,
                     //     2000

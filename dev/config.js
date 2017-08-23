@@ -1,5 +1,5 @@
 module.exports = new function() {
-    this.debug = false;
+    this.debug = true;
 
     this.dev = "http://localhost:8000";
 
