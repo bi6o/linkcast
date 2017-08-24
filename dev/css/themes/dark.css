@@ -21,7 +21,7 @@
     --panel_footer: #3e444c;
     --comments_background: #202427;
     --tab_hover_color: #222;
-    --border: rgba(0, 0, 0, 0.6);
+    --border: #222;
     --dark: #1c1e22;
 }
 
@@ -36,21 +36,23 @@ body {
 
 .form-control,
 .form-control:focus {
-    /* background: var(--primary_color);
-    border: 1px solid transparent;
-    border-radius: 0px;
     box-shadow: none;
-    color: var(--secondary_color); */
-}
-
-.notification-item {
-    background: var(--backgrounds);
+    outline: none;
 }
 
 .notification-item:hover {
     background: var(--dialogs-color);
 }
-
+.fa-heart:before {
+    content: "\f004";
+    color: #b33660;
+}
+.fa-group:before,
+.fa-users:before {
+    content: "\f0c0";
+    color: dodgerblue;
+    margin: 0px 4px;
+}
 /**                                                 **
  * --------------------BUTTONS---------------------- *
  *-------------------------------------------------- */
@@ -59,8 +61,25 @@ body {
 .input-group-btn .btn:not(.btn-raised),
 .btn:not(.btn-raised).btn-default,
 .input-group-btn .btn:not(.btn-raised).btn-default {
-    color: var(--secondary_text);
     border: 1px solid var(--dividers);
+}
+
+.btn-default {
+    background: #333333;
+    color: #fff;
+}
+.btn-default.active,
+.btn-default.active:hover,
+.btn-default.active:focus,
+.btn-default.active:active {
+    background: #777676 !important;
+    color: #fff !important;
+}
+.btn-default:hover,
+.btn-default:active,
+.btn-default:focus {
+    background: #222;
+    color: #777676;
 }
 
 /**                                                 **
@@ -96,8 +115,8 @@ label.radio-inline input[type=radio]:checked ~ .circle {
 }
 
 .form-group .form-control {
-    background-image: linear-gradient(#009688, #009688),
-        linear-gradient(#7d7d7d, #000000);
+    background: transparent;
+    border: none;
 }
 
 .form-group.is-focused .form-control {
@@ -108,13 +127,17 @@ label.radio-inline input[type=radio]:checked ~ .circle {
 .form-group .form-control {
     color: var(--primary_text);
 }
-
+.form-horizontal .form-group {
+    background: #1e1e1e;
+    padding: 4px 0px;
+    margin: 8px 0px 8px;
+}
 /**                                                 **
  * --------------------ITEMS------------------------ *
  *-------------------------------------------------- */
 
 .items > div:hover {
-    background: var(--dialogs-color);
+    background: var(--backgrounds);
 }
 
 .label.label-default {
@@ -157,7 +180,7 @@ a:hover {
 /*------------------------MAIN CONTENT AREA-------------------------------------*/
 
 .main-content-area {
-    background: var(--secondary_color);
+    background: var(--primary_color);
 }
 
 .footer {
@@ -170,7 +193,7 @@ a:hover {
  *-------------------------------------------------- */
 
 .panel {
-    background-color: var(--panel_color);
+    background-color: var(--primary_color);
     border: 1px solid var(--border);
 }
 
@@ -183,9 +206,9 @@ a:hover {
  * --------------------NAVTABS---------------------- *
  *-------------------------------------------------- */
 
-.nav .active .short-border {
+/* .nav .active .short-border {
     border-top: 1px solid white;
-}
+} */
 
 .nav-tabs {
     background: var(--secondary_color);
@@ -201,17 +224,15 @@ a:hover {
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
     color: var(--primary_text);
-    background-color: var(--panel_color);
+    background-color: var(--primary_color);
     border: 1px solid var(--border);
     border-bottom-color: transparent;
 }
 
 .nav-tabs > li > a:hover,
 .nav-tabs > li > a:focus {
-    background-color: initial;
-    border-color: var(--border);
-    border-bottom-color: transparent;
-    background-color: var(--tab_hover_color);
+    border-color: transparent;
+    background-color: var(--primary_color);
 }
 
 .main-nav li.active {
@@ -234,10 +255,11 @@ a:hover {
 }
 
 .inner-tab-content {
-    background: #272b30;
     padding: 0px;
 }
-
+.nav.secondary-nav {
+    border-bottom: 1px solid var(--border);
+}
 /* .inner-tab-content .tab-pane {
     height: 375px;
     overflow-y: scroll;
@@ -283,7 +305,6 @@ a:hover {
 
 .table {
     color: var(--table-font-color);
-    background-color: var(--backgrounds);
 }
 
 .table > thead > tr > th {

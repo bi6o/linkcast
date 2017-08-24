@@ -59,10 +59,13 @@ const user = new function() {
     };
 
     this.changePublicRights = e => {
+        if ($(e.target).hasClass("active")) {
+            return;
+        }
         var $handle = $(e.target).parents(".user-item");
         var user_id = $handle.data("id");
-        var group_id = $("#settings #groups-dd").val();
-        var group_rights = $(e.target).val();
+        var group_id = $("#tab-manage-groups #groups-dd").val();
+        var group_rights = $(e.target).find(".radio").val();
 
         auth.getUserId(chrome_id => {
             var params = {

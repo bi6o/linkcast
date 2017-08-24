@@ -7,7 +7,7 @@ window.$ = require("jquery");
 window.jQuery = $;
 require("bootstrap");
 window.moment = require("moment");
-require("bootstrap-material-design");
+//require("bootstrap-material-design");
 require("./color-picker");
 
 const storage = require("./popup/storage");
@@ -50,7 +50,7 @@ var plugin = () => {
          * @return {null}
          */
         init: () => {
-            $.material.init();
+            //$.material.init();
             main.bgPage = chrome.extension.getBackgroundPage();
             main._addEventListeners();
             var manifest = chrome.runtime.getManifest();
@@ -133,9 +133,9 @@ var plugin = () => {
                 var link = `chrome-extension://${chrome.runtime.id}/popup.html`;
                 window.open(link);
             });
-            $(document).on("click", ".title", e => {
+            $(document).on("click", "a.link", e => {
                 e.preventDefault();
-                var item_id = $(e.target).data("id");
+                var item_id = $(e.currentTarget).data("id");
                 item.getItem(item_id, user.info.id, (html, title) => {
                     $("#item-modal .items").html(html);
                     $("#item-modal .modal-title").html(title);
@@ -207,11 +207,11 @@ var plugin = () => {
                 self._tabChanged
             );
 
-            $("#edit-group").click(group.editGroup);
-            $("#edit-group-cancel-btn").click(() => {
-                $("#edit-group").removeClass("hide");
-                $(".editgroup-block").addClass("hide");
-            });
+            //$("#edit-group").click(group.editGroup);
+            // $("#edit-group-cancel-btn").click(() => {
+            //     $("#edit-group").removeClass("hide");
+            //     $(".editgroup-block").addClass("hide");
+            // });
             $("#tab-profile").on("click", "#logout", auth.logout);
             $(".status").on("click", "#edit-profile", e => {
                 //e.preventDefault();
@@ -225,14 +225,14 @@ var plugin = () => {
                     $(".tab-pane.active #group-private").addClass("hide");
                 }
             });
-            $("#tab-manage-group").on(
+            $("#tab-manage-groups").on(
                 "click",
                 ".remove-user",
                 group.removeUserFromGroup
             );
-            $("#tab-manage-group").on(
+            $("#tab-manage-groups").on(
                 "click",
-                ".user-item .radio",
+                ".user-item .btn-group .btn",
                 user.changePublicRights
             );
 
@@ -246,19 +246,23 @@ var plugin = () => {
                 ".group-leave",
                 group.leaveGroup
             );
-            $("#tab-customize #sound-setting .radio").click(e => {
-                storage.setItem("sound", $(e.target).val());
+            $("#tab-customize #sound-setting .btn").click(e => {
+                debugger;
+                storage.setItem("sound", $(e.target).find(".radio").val());
             });
-            $("#tab-customize #theme-setting .radio").click(e => {
-                storage.setItem("theme", $(e.target).val());
+            $("#tab-customize #theme-setting .btn").click(e => {
+                storage.setItem("theme", $(e.target).find(".radio").val());
                 self.setTheme();
             });
-            $("#tab-customize #rich-notification .radio").click(e => {
-                storage.setItem("richNotification", $(e.target).val());
+            $("#tab-customize #rich-notification .btn").click(e => {
+                storage.setItem(
+                    "richNotification",
+                    $(e.target).find(".radio").val()
+                );
             });
-            $("#tab-customize #sound-setting .radio").click(e => {
-                storage.setItem("sound", $(e.target).val());
-            });
+            // $("#tab-customize #sound-setting .radio").click(e => {
+            //     storage.setItem("sound", $(e.target).val());
+            // });
             /**
              * Not allowing user to update username.
              * Maybe a future release
@@ -305,7 +309,7 @@ var plugin = () => {
                     if (targets.indexOf(target) !== -1) {
                         //take care of sub tabs which are default
                         if (target === "#tab-links") {
-                            target = "#tab-favourites";
+                            target = $(target).find("li.active a").attr("href");
                         }
                         item.fetchItems(target, "html", null);
                     } else if (target === "#tab-groups") {
@@ -314,7 +318,10 @@ var plugin = () => {
                         notification.getNotifications();
                     } else if (target === "#tab-about") {
                         main._getRandomQuote();
-                    } else if (target === "#settings") {
+                    } else if (target === "#tab-manage-groups") {
+                        group.editGroup();
+                        $("#tab-groups #groups-dd").trigger("change");
+                    } else if (target === "#tab-settings") {
                         group.fetchGroups();
                         var theme = storage.getItem("theme");
                         var sound = storage.getItem("sound");
@@ -323,24 +330,20 @@ var plugin = () => {
                         );
                         if (theme !== null) {
                             $(
-                                "#tab-customize #theme-setting .radio[value='" +
-                                    theme +
-                                    "']"
-                            ).attr("checked", "checked");
+                                "#theme-setting label[data-val='" + theme + "']"
+                            ).click();
                         }
                         if (richNotification !== null) {
                             $(
-                                "#tab-customize #rich-notification .radio[value='" +
+                                "#rich-notification label[data-val='" +
                                     richNotification +
                                     "']"
-                            ).attr("checked", "checked");
+                            ).click();
                         }
                         if (sound !== null) {
                             $(
-                                "#tab-customize #sound-setting .radio[value='" +
-                                    sound +
-                                    "']"
-                            ).attr("checked", "checked");
+                                "#sound-setting label[data-val='" + sound + "']"
+                            ).click();
                         }
                     } else if (target === "#add-item") {
                         group.fetchGroups();

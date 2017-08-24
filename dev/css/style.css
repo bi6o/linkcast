@@ -8,7 +8,14 @@ body {
     display: flex;
     justify-content: center;
 }
-
+.btn:focus,
+.btn:active:focus,
+.btn.active:focus,
+.btn.focus,
+.btn:active.focus,
+.btn.active.focus {
+    outline: none;
+}
 .container {
     width: 784px;
     margin: 0 auto;
@@ -62,7 +69,7 @@ a:focus {
 .green:active,
 .green:focus,
 .green:hover {
-    color: #25981b;
+    color: #44b93a;
 }
 
 header {
@@ -131,8 +138,8 @@ header #img-logo {
 /*------------------------------SECONDARY NAV---------------------------------*/
 
 .nav.secondary-nav {
-    margin-top: 8px;
     z-index: 1;
+    padding: 8px;
 }
 
 .nav .active .short-border {
@@ -166,6 +173,7 @@ header #img-logo {
 
 .form-group label {
     font-size: inherit;
+    color: #717171;
 }
 
 /*----Floating inputs-----*/
@@ -179,16 +187,21 @@ header #img-logo {
 .form-group.label-floating.is-focused label.control-label {
     top: -25px;
 }
-
+.required:after {
+    color: #d00;
+    content: "*";
+    position: absolute;
+    margin-left: 3px;
+    top: 4px;
+}
 /*----------------------------CONTENT-AREA--------------------------------------*/
 
 .inner-inset {
-    padding: 8px 16px;
-    background: #212429;
+    padding: 8px 24px;
 }
 
 .inner-tab-content .tab-pane {
-    padding: 16px;
+    padding: 16px 24px;
 }
 
 .footer {
@@ -208,7 +221,6 @@ header #img-logo {
 
 .items .item {
     border-bottom: 1px solid rgba(0, 0, 0, 0.37);
-    background: var(--backgrounds);
     margin-bottom: 1px;
     padding: 8px 16px;
     cursor: pointer;
@@ -273,12 +285,34 @@ header #img-logo {
 /* notification */
 
 .notification-item {
-    padding: 7px 10px;
-    margin-bottom: 6px;
-    margin: 8px 16px;
+    padding: 8px 24px;
+    display: flex;
 }
-
-.notification-item .comment-date {
+.notification-item .username {
+    flex: 1 0 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-right: 8px;
+    align-self: center;
+}
+.notification-item .link {
+    flex: 6 0 0;
+}
+.notification-item .comment-meta {
+    margin-left: 8px;
+}
+.notification-item .comment-wrapper {
+    display: inline-flex;
+    width: 520px;
+}
+.notification-item .comment {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.notification-item .activity {
+    margin-right: 8px;
 }
 
 /*Modal*/
@@ -324,7 +358,11 @@ header #img-logo {
 .comments-section {
     padding: 4px 10px;
 }
-
+/* Table */
+.table > tbody > tr > td,
+.table > thead > tr > th {
+    padding-left: 0px;
+}
 /**Vertival tabs**/
 
 h3 {

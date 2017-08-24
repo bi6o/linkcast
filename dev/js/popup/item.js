@@ -209,14 +209,16 @@ module.exports = new function() {
                 .replace("{GROUP_NAME}", common.escape(gname))
                 .replace("{GROUP_ID}", gname)
                 .replace("{DELETE}", deleteBtn)
-                .replace("{COMMENTS_COUNT}", item.comments_count)
                 .replace(
-                    "{LIKE_ICON}",
-                    item.likes_count > 0 ? "heart" : "heart-o"
+                    "{COMMENT_ICON}",
+                    item.comments_count > 0 ? "comments" : "comment-o"
                 )
+                .replace("{COMMENTS_COUNT}", item.comments_count)
+                .replace("{LIKE_ICON}", item.liked == 1 ? "heart" : "heart-o")
                 .replace("{COLOR}", item.color)
                 .replace("{TIMES_CLICKED}", item.times_clicked)
                 .replace("{LIKES_COUNT}", item.likes_count)
+                .replace("{LIKED}", item.liked)
                 .replace("{CREATED_AT}", this.timeAgo(item.created_at));
             html += item;
         });
@@ -301,9 +303,10 @@ module.exports = new function() {
         var url = $handle.find(".item-link").attr("href");
         var title = $handle.find(".item-link").text();
 
-        $('a[data-target="#add-item"]').click();
-        $("#add-item #item-name").val(title);
-        $("#add-item #item-url").val(url);
+        $('a[href="#tab-post"]').click();
+        $("#tab-post #item-name").val(title);
+        $("#tab-post #item-url").val(url);
+        setTimeout(() => $("#tab-post #item-comments").focus(), 0);
     };
 
     this.deleteItem = e => {

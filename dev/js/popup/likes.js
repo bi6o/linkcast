@@ -8,7 +8,7 @@ module.exports = new function() {
         var $handle = $(e.target).parent();
         var $item = $handle.parents(".item");
         var item_id = $item.data("id");
-
+        $item.attr("data-liked", $item.attr("data-liked") == "0" ? 1 : 0);
         auth.getUserId(chrome_id => {
             var params = {
                 item_id: item_id,
@@ -17,7 +17,7 @@ module.exports = new function() {
             };
             request.post(common.getDataString(params), data => {
                 let count = parseInt(data.count);
-                if (count > 0) {
+                if ($item.attr("data-liked") == "1") {
                     $handle
                         .find(".fa.heart")
                         .removeClass("fa-heart-o")

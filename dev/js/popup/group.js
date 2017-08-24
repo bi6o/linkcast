@@ -211,12 +211,12 @@ module.exports = new function() {
 
     this.groupDDChanged = () => {
         var group_id = $("#tab-groups #groups-dd").val();
-        $(".editgroup-block").addClass("hide");
+        //$(".editgroup-block").addClass("hide");
         var isAdmin = $("#tab-groups #groups-dd option:selected").attr("admin");
         var admin_id = $("#tab-groups #groups-dd option:selected").attr(
             "admin-id"
         );
-
+        this.editGroup();
         if (isAdmin == "true") {
             //allow this fellow to edit the group
             $("#edit-group").removeClass("hide");
@@ -248,7 +248,7 @@ module.exports = new function() {
                             .replace("{NICKNAME}", item.nickname)
                             .replace("{USER_ID}", item.id)
                             .replace("{REMOVE}", remove)
-                            .replace("{" + item.group_rights + "}", "checked")
+                            .replace("{" + item.group_rights + "}", "active")
                             .replace(new RegExp("{i}", "g"), i);
                     });
                     $("#group-users-table tbody").html(html);
@@ -316,9 +316,8 @@ module.exports = new function() {
                     html += `<tr data-gid="${item.id}">
                                 <td>
                                     <a href="#" class="group-name"><strong>${item.name}</strong></a>
-                                    <br/>
-                                    ${item.desc}
                                 </td>
+                                <td>${item.desc}</td>
                                 <td>
                                     ${item.group_rights}
                                 </td>
@@ -354,8 +353,8 @@ module.exports = new function() {
     };
 
     this.editGroup = e => {
-        $(e.target).addClass("hide");
-        $(".editgroup-block").removeClass("hide");
+        // $(e.target).addClass("hide");
+        //$(".editgroup-block").removeClass("hide");
         var $markup = $("#create-group-block").clone(); //editgroup-block
         $markup.find("#create-group").remove();
         $markup = $markup[0].innerHTML.replace(
