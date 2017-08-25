@@ -84,6 +84,7 @@ var plugin = () => {
                         storage.getItem("defaultGroupName")
                     );
                     $("#profile-color").spectrum({
+                        preferredFormat: "hsl",
                         color: user.info.color
                     });
 
@@ -213,10 +214,6 @@ var plugin = () => {
             //     $(".editgroup-block").addClass("hide");
             // });
             $("#tab-profile").on("click", "#logout", auth.logout);
-            $(".status").on("click", "#edit-profile", e => {
-                //e.preventDefault();
-                $("#tab-profile #edit-profile").removeClass("hide");
-            });
             $(document).on("click", "#group-visibility input", e => {
                 var visibility = $(e.target).val();
                 if (visibility == "0") {

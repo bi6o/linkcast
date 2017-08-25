@@ -48,8 +48,8 @@ body {
     color: #b33660;
 }
 .fa-group:before,
-.fa-users:before {
-    content: "\f0c0";
+.fa-users:before,
+.fa-user:before {
     color: dodgerblue;
     margin: 0px 4px;
 }
@@ -82,6 +82,14 @@ body {
     color: #777676;
 }
 
+.btn-group .btn {
+    background: rgba(12, 12, 12, 0) !important;
+}
+.btn-group .btn.active,
+.btn-group .btn:hover {
+    background: #1a1a1a !important;
+    color: #fff;
+}
 /**                                                 **
  * --------------------RADIO------------------------ *
  *-------------------------------------------------- */
@@ -116,7 +124,9 @@ label.radio-inline input[type=radio]:checked ~ .circle {
 
 .form-group .form-control {
     background: transparent;
-    border: none;
+    border: 1px solid #333;
+    border-radius: 0px;
+    padding: 2px 12px;
 }
 
 .form-group.is-focused .form-control {
@@ -184,7 +194,6 @@ a:hover {
 }
 
 .footer {
-    background: #3e444c;
     border: 1px solid #2e3339;
 }
 
@@ -331,7 +340,7 @@ a:hover {
  *-------------------------------------------------- */
 
 #tab-feed #groups-dd {
-    background: #000;
+    background: var(--light-dark);
     border: 1px solid #000;
 }
 
@@ -351,5 +360,5 @@ a:hover {
 }
 
 .modal-content {
-    background: var(--secondary_color);
+    background: var(--primary_color);
 }

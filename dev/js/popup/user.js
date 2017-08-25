@@ -12,9 +12,8 @@ const user = new function() {
      */
     this.welcomeUser = nickname => {
         var logout = '<a href="#" id="logout">Logout</a>';
-        var edit = '<a href="#" id="edit-profile">Edit</a>';
         $(".status").html(
-            `Connected as <strong>${nickname}</strong>, ${edit} - ${logout}`
+            `Connected as <strong>${nickname}</strong>, ${logout}`
         );
         $("#new-nickname").val(nickname);
         $("#profile-color").val(this.info.color);

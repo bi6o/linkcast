@@ -31,18 +31,19 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="tab-feed">
-                <div class="scroll">
-                    <div class="items user-enabled"></div>
-                </div>
                 <div class="footer">
                     <div class="pull-left">
                         <!-- Connected to Group: <strong id="group-display">-</strong> -->
                     </div>
-                    <div class="pull-right">
+                    <div class="pull-left">
                         <select id="groups-dd"></select>
                     </div>
                     <span class="clearfix" />
                 </div>
+                <div class="scroll">
+                    <div class="items user-enabled"></div>
+                </div>
+
             </div>
             <div class="tab-pane fade" id="tab-post">
                 <div class="col-sm-12 pt20 form-horizontal">
@@ -73,7 +74,7 @@
                         </div>
                     </div>
                     <div class="col-sm-9 col-sm-offset-3">
-                        <button id="post-btn" type="submit" class="btn btn-default btn-sm">Submit</button>
+                        <button id="post-btn" type="submit" class="btn btn-default btn-sm">Post</button>
                     </div>
                 </div>
             </div>
@@ -138,8 +139,8 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <div class="col-sm-offset-2">
-                                    <button type="submit" id="join-group" class="btn btn-default btn-sm">Submit<div class="ripple-container"></div></button>
+                                <div class="col-sm-offset-3 col-sm-9">
+                                    <button type="submit" id="join-group" class="btn btn-default btn-sm">Join<div class="ripple-container"></div></button>
                                 </div>
                             </div>
                         </div>
@@ -248,8 +249,8 @@
                     <div class="tab-pane active" id="tab-profile">
                         <div class="authorized">
                             <div class="status"></div>
-                            <div id="edit-profile" class="hide">
-                                <form>
+                            <div id="edit-profile">
+                                <form class="form-horizontal">
                                     <div class="form-group" style="line-height: 44px;">
                                         <label class="control-label col-sm-3" for="profile-color">Color</label>
                                         <div class="col-sm-9">
@@ -268,8 +269,9 @@
                                             <input class="form-control" id="bio" type="text">
                                         </div>
                                     </div>
-
-                                    <button type="submit" style="margin-left: 14px;" class="profile-btn btn btn-default btn-sm">Save</button>
+                                    <div class="col-xs-offset-3">
+                                        <button type="submit" style="margin-left: 14px;" class="profile-btn btn btn-default btn-sm">Save</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -400,7 +402,7 @@
                         </div>
                     </div>
                     <div class="col-sm-9">
-                        <div class="scroll" style="height: 318px">
+                        <div class="scroll" style="height: 374px">
                             <div class="items"></div>
                         </div>
                     </div>
