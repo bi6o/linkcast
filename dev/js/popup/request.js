@@ -1,6 +1,6 @@
 const storage = require("./storage");
 const config = require("../../config");
-const request = new function() {
+module.exports = new function() {
     this._sendRequest = (type, data, callback) => {
         $.ajax({
             url: config.getEndpoint(),
@@ -29,4 +29,3 @@ const request = new function() {
         this._sendRequest("GET", data, callback);
     };
 }();
-module.exports = request;

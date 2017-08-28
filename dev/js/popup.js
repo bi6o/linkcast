@@ -283,11 +283,12 @@ var plugin = () => {
          * @param  {event}
          */
         _tabChanged: e => {
+            console.log(2);
             e.preventDefault();
             var target = $(e.target).attr("href"); // activated tab
             item.page = 1;
             $("div.items").html(
-                '<div id="loader" class="preloader"><img src="assets/loader.svg"></div>'
+                '<div id="loader" class="preloader"><img src="public/images/loader.svg"></div>'
             );
 
             user.userExist(result => {

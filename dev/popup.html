@@ -3,14 +3,10 @@
 
 <head>
     <title>LinkCast</title>
-    <link rel="stylesheet" href="css/bootstrap.css" type="text/css"></link>
-
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <!-- <link rel="stylesheet" href="css/bootstrap-material-design.min.css"> -->
-    <!-- <link rel="stylesheet" href="css/ripple.min.css"> -->
-    <link href="css/style.css" rel="stylesheet" type="text/css"></link>
-
-    <link href="css/themes/dark.css" id="theme" rel="stylesheet" type="text/css"></link>
+    <link rel="stylesheet" href="public/css/bootstrap.css" type="text/css"></link>
+    <link rel="stylesheet" href="public/css/font-awesome.min.css">
+    <link href="public/css/style.css" rel="stylesheet" type="text/css"></link>
+    <link href="public/css/themes/dark.css" id="themes" rel="stylesheet" type="text/css"></link>
 </head>
 
 <body>
@@ -27,7 +23,7 @@
         <div class="tab-content main-content-area">
             <div class="scroll tab-pane fade active in" id="tab-notifications">
                 <div class="items user-enabled">
-                    <div id="loader" class="preloader"><img src="assets/loader.svg"></div>
+                    <div id="loader" class="preloader"><img src="public/images/loader.svg"></div>
                 </div>
             </div>
             <div class="tab-pane fade" id="tab-feed">
@@ -420,7 +416,7 @@
     <div class="hide" id="item-template">
         <div class="left clearfix item" data-liked="{LIKED}" data-id="{ITEM_ID}" data-uid="{USER_ID}">
             <span class="items-img pull-left"><span class="favourite glyphicon {STAR}"></span><img class="lazy" width="60"
-                src="assets/default.png" data-src="{THUMB}"></span>
+                src="public/images/default.png" data-src="{THUMB}"></span>
             <div class="items-body clearfix">
                 <div class="header">
                     <a href="" class="username" data-id="{USER_ID}"><strong class="primary-font" style="color:{COLOR}">{NICKNAME}</strong></a>                    <span class="label label-default">{GROUP_NAME}</span>
@@ -494,7 +490,13 @@
             </span>
         </div>
     </div>
-    <script async src="app.entry.js"></script>
+
+    <script type="text/javascript">
+        window.mode = "development_mode";
+    </script>
+    <!-- replace:[js] -->
+    <script async src="http://localhost:3000/build/app.js"></script>
+    <!-- endreplace -->
 </body>
 
 </html>

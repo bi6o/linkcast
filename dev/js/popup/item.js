@@ -77,7 +77,6 @@ module.exports = new function() {
             });
         }
     };
-
     this.getOtherUserItems = (
         target_user_id,
         user_id,
@@ -183,7 +182,7 @@ module.exports = new function() {
             let thumbnail = item.thumbnail;
 
             if (item.thumbnail == "" || item.thumbnail == null) {
-                thumbnail = "assets/weed.jpg";
+                thumbnail = "public/images/weed.jpg";
             }
 
             var gname = localStorage.defaultGroup != 0 ? "" : item.gname;
