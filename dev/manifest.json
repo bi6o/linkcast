@@ -16,12 +16,12 @@
         "default_popup": "popup.html"
     },
     "background": {
-        "scripts": ["js/background.js"]
+        "scripts": ["background.js"]
     },
     "content_scripts": [
         {
             "matches": ["https://*/*", "http://*/*"],
-            "js": ["js/content.js"],
+            "js": ["content.js"],
             "run_at": "document_end"
         }
     ],

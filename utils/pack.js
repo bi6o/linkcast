@@ -15,7 +15,19 @@ module.exports = function(params, isDev) {
         path.join(params.root, "build", "popup.html"),
         htmlOutput
     );
-
+    var jsFileName = "dev/background.js";
+    var js = FileSystem.readFileSync(
+        path.join(params.root, jsFileName),
+        "utf8"
+    );
+    var jsOutput = js.replace(
+        "http://localhost:8000",
+        "http://playground.ajaxtown.com/youtube_chrome_backend/index.php"
+    );
+    FileSystem.writeFileSync(
+        path.join(params.root, "build", "background.js"),
+        jsOutput
+    );
     // zip it.
     var output = FileSystem.createWriteStream(params.target);
     var archive = archiver("zip");

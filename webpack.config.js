@@ -2,11 +2,11 @@ var webpack = require("webpack");
 var SassPlugin = require("sass-webpack-plugin");
 var StringReplacePlugin = require("string-replace-webpack-plugin");
 var path = require("path");
-var publisher = require("./dev/lib/publisher");
+var publisher = require("./utils/publisher");
 var tokens = require("./tokens");
-var copy = require("./webpack/copy");
-var pack = require("./webpack/pack");
-
+var copy = require("./utils/copy");
+var pack = require("./utils/pack");
+var CopyWebpackPlugin = require("copy-webpack-plugin");
 var isDev =
     process.argv
         .filter(arg => {
@@ -16,7 +16,7 @@ var isDev =
 
 module.exports = {
     entry: {
-        popup: ["./dev/js/popup.js"]
+        popup: "./dev/popup.js"
     },
     output: {
         path: path.join(__dirname, "build"),
@@ -24,7 +24,7 @@ module.exports = {
         filename: "[name].js"
     },
     devServer: {
-        host: "localhost", // Your Computer Name
+        host: "localhost",
         port: 3000
     },
     plugins: [
@@ -34,8 +34,13 @@ module.exports = {
             output: { comments: false },
             sourceMap: true
         }),
-        copy(isDev),
-        //new SassPlugin("dev/css/themes/dark.scss"),
+        new CopyWebpackPlugin(
+            [{ context: "dev", from: "**/*", to: "../build" }],
+            {
+                ignore: ["popup.js", "js", "popup.html", "background.js"]
+            }
+        ),
+        // //new SassPlugin("dev/css/themes/dark.scss"),
         function() {
             this.plugin("done", function(statsData) {
                 var stats = statsData.toJson();

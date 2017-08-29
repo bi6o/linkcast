@@ -1,5 +1,5 @@
-const chromeWebStore = require("./chrome_web_store");
-const extensionVersion = require("./extension_version");
+const chromeWebStore = require("./lib/chrome_web_store");
+const extensionVersion = require("./lib/extension_version");
 const FileSystem = require("fs");
 const path = require("path");
 const sprintf = require("sprintf");

@@ -7,19 +7,18 @@ window.$ = require("jquery");
 window.jQuery = $;
 require("bootstrap");
 window.moment = require("moment");
-//require("bootstrap-material-design");
-require("./color-picker");
+require("./js/color-picker");
 
-const storage = require("./popup/storage");
-const request = require("./popup/request");
-const common = require("./common/common");
-const item = require("./popup/item");
-const group = require("./popup/group");
-const user = require("./popup/user");
-const auth = require("./popup/auth");
-const comments = require("./popup/comments");
-const likes = require("./popup/likes");
-const notification = require("./popup/notification");
+const storage = require("./js/popup/storage");
+const request = require("./js/popup/request");
+const common = require("./js/common/common");
+const item = require("./js/popup/item");
+const group = require("./js/popup/group");
+const user = require("./js/popup/user");
+const auth = require("./js/popup/auth");
+const comments = require("./js/popup/comments");
+const likes = require("./js/popup/likes");
+const notification = require("./js/popup/notification");
 
 var plugin = () => {
     /**
