@@ -1,66 +1,81 @@
-var CopyWebpackPlugin = require("copy-webpack-plugin");
 var webpack = require("webpack");
 var SassPlugin = require("sass-webpack-plugin");
-
+var StringReplacePlugin = require("string-replace-webpack-plugin");
 var path = require("path");
-var glob = require("glob");
+var publisher = require("./dev/lib/publisher");
+var tokens = require("./tokens");
+var copy = require("./webpack/copy");
+var pack = require("./webpack/pack");
+
+var isDev =
+    process.argv
+        .filter(arg => {
+            return arg == "-p";
+        })
+        .join() != "-p";
 
 module.exports = {
     entry: {
-        app: ["./dev/js/popup.js"]
+        popup: ["./dev/js/popup.js"]
     },
     output: {
-        path: path.join(__dirname, "dev"),
-        filename: "[name].entry.js"
+        path: path.join(__dirname, "build"),
+        publicPath: "/build",
+        filename: "[name].js"
+    },
+    devServer: {
+        host: "localhost", // Your Computer Name
+        port: 3000
     },
     plugins: [
-        new webpack.ContextReplacementPlugin(
-            /\.\/locale$/,
-            "empty-module",
-            false,
-            /js$/
-        ),
+        new StringReplacePlugin(),
         new webpack.optimize.UglifyJsPlugin({
             compress: { warnings: false },
             output: { comments: false },
             sourceMap: true
         }),
-        new webpack.DefinePlugin({
-            "process.env": {
-                NODE_ENV: '"dev"'
-            }
-        }),
+        copy(isDev),
         //new SassPlugin("dev/css/themes/dark.scss"),
-        new CopyWebpackPlugin(
-            [
-                // {output}/file.txt
-                { context: "dev", from: "*", to: "../build/" },
-                { context: "dev", from: "assets/*", to: "../build/" },
-                { context: "dev", from: "sound/*", to: "../build/" },
-                { context: "dev", from: "css/**", to: "../build/" },
-                { context: "dev", from: "fonts/**", to: "../build/" },
-                {
-                    context: "dev",
-                    from: "js/background.js",
-                    to: "../build/js"
-                },
-                { context: "dev", from: "js/content.js", to: "../build/js" }
-            ],
-            {
-                ignore: ["webpack.config.js", "package.json"]
-            }
-        )
+        function() {
+            this.plugin("done", function(statsData) {
+                var stats = statsData.toJson();
+                if (!stats.errors.length && !isDev) {
+                    //pack the build
+                    pack({
+                        root: __dirname,
+                        src: path.join(__dirname, "build/"),
+                        target: path.join(__dirname, "/linkcast.zip"),
+                        callback: params => {
+                            let manifest = path.join(
+                                __dirname,
+                                "/dev/manifest.json"
+                            );
+                            // publish to chrome
+                            publisher.publish({
+                                archive: params.target,
+                                tokens: tokens,
+                                manifestPath: manifest
+                            });
+                        }
+                    });
+                }
+            });
+        }
     ],
     module: {
-        loaders: [
-            // js
+        rules: [
+            {
+                test: /\.html$/,
+                use: [{ loader: "file-loader?name=[path][name].[ext]" }]
+            },
             {
                 test: /\.js$/,
-                loaders: ["babel-loader"],
-                exclude: /node_modules/
-            }
-        ],
-        rules: [
+                use: [
+                    {
+                        loader: "babel-loader"
+                    }
+                ]
+            },
             {
                 test: /\.scss$/,
                 use: [
