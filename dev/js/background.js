@@ -112,7 +112,7 @@ setInterval(function() {
                             var richNotification = localStorage.richNotification;
 
                             if (sound !== null && sound == "1") {
-                                var yourSound = new Audio("../sound/noti.mp3");
+                                var yourSound = new Audio("../public/sound/noti.mp3");
                                 yourSound.play();
                             }
 
