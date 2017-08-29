@@ -7,6 +7,13 @@ var tokens = require("./tokens");
 var copy = require("./webpack/copy");
 var pack = require("./webpack/pack");
 
+var isDev =
+    process.argv
+        .filter(arg => {
+            return arg == "-p";
+        })
+        .join() != "-p";
+
 module.exports = {
     entry: {
         popup: ["./dev/js/popup.js"]
@@ -27,19 +34,33 @@ module.exports = {
             output: { comments: false },
             sourceMap: true
         }),
-        copy(),
+        copy(isDev),
         //new SassPlugin("dev/css/themes/dark.scss"),
-        pack({
-            src: path.join(__dirname, "build/"),
-            target: path.join(__dirname, "/linkcast.zip"),
-            callback: params => {
-                publisher.publish({
-                    archive: params.target,
-                    tokens: tokens,
-                    manifestPath: path.join(__dirname, "/dev/manifest.json")
-                });
-            }
-        })
+        function() {
+            this.plugin("done", function(statsData) {
+                var stats = statsData.toJson();
+                if (!stats.errors.length && !isDev) {
+                    //pack the build
+                    pack({
+                        root: __dirname,
+                        src: path.join(__dirname, "build/"),
+                        target: path.join(__dirname, "/linkcast.zip"),
+                        callback: params => {
+                            let manifest = path.join(
+                                __dirname,
+                                "/dev/manifest.json"
+                            );
+                            // publish to chrome
+                            publisher.publish({
+                                archive: params.target,
+                                tokens: tokens,
+                                manifestPath: manifest
+                            });
+                        }
+                    });
+                }
+            });
+        }
     ],
     module: {
         rules: [
