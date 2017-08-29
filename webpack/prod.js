@@ -22,18 +22,13 @@ module.exports = {
             output: { comments: false },
             sourceMap: true
         }),
-        new CopyWebpackPlugin(
-            [
-                {
-                    context: path.resolve(__dirname, "../dev"),
-                    from: "**/*",
-                    to: path.resolve(__dirname, "../build")
-                }
-            ],
+        new CopyWebpackPlugin([
             {
-                ignore: ["popup.js", "js", "popup.html"]
+                context: path.resolve(__dirname, "../dev"),
+                from: "**/*",
+                to: path.resolve(__dirname, "../build")
             }
-        ),
+        ]),
         // //new SassPlugin("dev/css/themes/dark.scss"),
         function() {
             this.plugin("done", function(statsData) {
@@ -50,11 +45,11 @@ module.exports = {
                                 "../dev/manifest.json"
                             );
                             //publish to chrome
-                            // publisher.publish({
-                            //     archive: params.target,
-                            //     tokens: tokens,
-                            //     manifestPath: manifest
-                            // });
+                            publisher.publish({
+                                archive: params.target,
+                                tokens: tokens,
+                                manifestPath: manifest
+                            });
                         }
                     });
                 }
