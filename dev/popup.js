@@ -315,6 +315,8 @@ var plugin = () => {
                         notification.getNotifications();
                     } else if (target === "#tab-about") {
                         main._getRandomQuote();
+                    } else if (target === "#tab-post") {
+                        $("#item-modal").modal("hide");
                     } else if (target === "#tab-manage-groups") {
                         group.editGroup();
                         $("#tab-groups #groups-dd").trigger("change");
@@ -504,6 +506,10 @@ var plugin = () => {
                 auth.login(params, data => {
                     user.welcomeUser(params.nickname);
                     user.afterLogin(data);
+                    $("#profile-color").spectrum({
+                        preferredFormat: "hsl",
+                        color: user.info.color
+                    });
                     main.bgPage.updateVersion();
                 });
             });

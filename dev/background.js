@@ -95,7 +95,7 @@ var retrieveSiteMeta = function(passed_message, callback) {
 
 var countStore = 0;
 var countData = { rows: [], pages: 0 };
-var endpoint = "http://localhost:8000";
+var endpoint = "http://playground.ajaxtown.com/youtube_chrome_backend/index.php";
 
 function checkStorage() {
     if (typeof localStorage.richNotification === "undefined") {
@@ -148,7 +148,8 @@ setInterval(function() {
                         bg: 1,
                         chrome_id: userid
                     },
-                    function(data) {
+                    function(response) {
+                        var data = JSON.parse(response);
                         nData = data;
                         //data contains wallCount and updateCount
                         var totalCount = data.rows.length;
@@ -223,7 +224,7 @@ setInterval(function() {
             }
         });
     }
-}, 15000);
+}, 10000);
 
 var sendClickedStat = function(data) {
     $.post(url, data);
@@ -248,7 +249,8 @@ var updateVersion = function() {
                 $.get(
                     endpoint,
                     { chrome_id: response.userid, action: "fetchUserInfo" },
-                    function(result) {
+                    function(response) {
+                        var result = JSON.parse(result);
                         if (typeof localStorage.chrome_id == "undefined") {
                             localStorage.nickname = result.data.nickname;
                             localStorage.loggedIn = true;

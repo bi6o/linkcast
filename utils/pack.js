@@ -1,33 +1,30 @@
 var FileSystem = require("fs");
 var path = require("path");
 var archiver = require("archiver");
+var appConfig = require("../app.config.json");
 
+function writeFileToDisk(params, filePath, content) {
+    return FileSystem.writeFileSync(path.join(params.root, filePath), content);
+}
+function readFile(params, filePath) {
+    return FileSystem.readFileSync(path.join(params.root, filePath), "utf8");
+}
 module.exports = function(params, isDev) {
-    var htmlFileName = "dev/popup.html";
-    var html = FileSystem.readFileSync(
-        path.join(params.root, htmlFileName),
-        "utf8"
-    );
-    var htmlOutput = html
-        .replace("http://localhost:3000/build", "")
-        .replace("development_mode", "prod");
-    FileSystem.writeFileSync(
-        path.join(params.root, "build", "popup.html"),
-        htmlOutput
-    );
-    var jsFileName = "dev/background.js";
-    var js = FileSystem.readFileSync(
-        path.join(params.root, jsFileName),
-        "utf8"
-    );
-    var jsOutput = js.replace(
-        "http://localhost:8000",
-        "http://playground.ajaxtown.com/youtube_chrome_backend/index.php"
-    );
-    FileSystem.writeFileSync(
-        path.join(params.root, "build", "background.js"),
-        jsOutput
-    );
+    // replace html
+    var data = readFile(params, "dev/popup.html");
+    data = data.replace(appConfig.wpServer + "build/", "");
+    writeFileToDisk(params, "build/popup.html", data);
+
+    //replace environment
+    var data = readFile(params, "dev/env.js");
+    data = data.replace('window.APP_ENV = "dev"', 'window.APP_ENV = "prod"');
+    writeFileToDisk(params, "build/env.js", data);
+
+    //replace background
+    var data = readFile(params, "dev/background.js");
+    data = data.replace(appConfig.dev, appConfig.prod);
+    writeFileToDisk(params, "dev/background.js", data);
+
     // zip it.
     var output = FileSystem.createWriteStream(params.target);
     var archive = archiver("zip");
