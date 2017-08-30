@@ -38,5 +38,5 @@ If you have any ideas or would like to contribute, feel free to send PR's or cre
 
 ## Thanks
 Thanks for contributing folks:
-- @fleshsword Todd Cantley - For designs
-- @farokojil Farok, @bi6o Bitar - for ideas and filing bugs
+- @fleshsword - For designs
+- @farokojil, @bi6o - for ideas and filing bugs and for being power users
