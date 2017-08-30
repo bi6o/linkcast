@@ -95,7 +95,7 @@ var retrieveSiteMeta = function(passed_message, callback) {
 
 var countStore = 0;
 var countData = { rows: [], pages: 0 };
-var endpoint = "http://playground.ajaxtown.com/youtube_chrome_backend/index.php";
+var endpoint = "http://localhost:8000";
 
 function checkStorage() {
     if (typeof localStorage.richNotification === "undefined") {
@@ -168,7 +168,7 @@ setInterval(function() {
 
                             if (sound !== null && sound == "1") {
                                 var yourSound = new Audio(
-                                    "../public/sound/noti.mp3"
+                                    "public/sound/noti.mp3"
                                 );
                                 yourSound.play();
                             }
@@ -204,7 +204,7 @@ setInterval(function() {
                                     message: "New Links posted",
                                     title: title,
                                     iconUrl: chrome.runtime.getURL(
-                                        "assets/notification.png"
+                                        "public/icons/notification.png"
                                     ),
                                     items: itemList
                                 };
@@ -227,7 +227,7 @@ setInterval(function() {
 }, 10000);
 
 var sendClickedStat = function(data) {
-    $.post(url, data);
+    $.post(endpoint, data);
 };
 
 window.nData = {};

@@ -20,7 +20,6 @@ const store = function(params) {
     chromeWebStore
         .getAccessToken(clientId, clientSecret, refreshToken)
         .then(_accessTokenParams => {
-            console.log("Uploading updated package", manifestPath);
             accessTokenParams = _accessTokenParams;
             return chromeWebStore.getPackage(
                 appId,
