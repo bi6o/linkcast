@@ -1,10 +1,9 @@
 # Linkcast
 
 Linkcast is a chrome extension which organises your links facilitates sharing. Few of the features are:
-- Mark a link as favourite
 - Post a link in a group and all users in that group get notified.
 - Create a public or private group
-- Like a particular post and also add comments
+- Like a particular post, mark favourite and also add comments
 - As an admin, you will have full control of users and thier permissions
 
 ## History
