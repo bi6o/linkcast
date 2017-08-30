@@ -68,7 +68,9 @@ var plugin = () => {
                 } else {
                     main._detectSite();
                     $(".authorized").removeClass("hide");
-                    user.info = result.data;
+
+                    //check for email
+                    user.checkEmailExist();
                     /* Show notifications */
                     notification.getNotifications();
                     group.fetchGroups();
@@ -110,6 +112,15 @@ var plugin = () => {
             $("#post-btn").click(item.addItem);
             $("#default-group").click(() => {
                 group.makeGroupDefault("#settings #groups-dd");
+            });
+
+            $(".email-btn").click(e => {
+                var email = $("#add-email").val();
+                var re = /^(([^<>()[]\.,;:s@"]+(.[^<>()[]\.,;:s@"]+)*)|(".+"))@(([[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}])|(([a-zA-Z-0-9]+.)+[a-zA-Z]{2,}))$/gim;
+                if (re.test(email)) {
+                    //save it
+                    user.saveEmail(email);
+                }
             });
             $(document).on("click", ".favourite", item.makeFavourite);
             $(document).on("click", ".delete-item", item.deleteItem);
@@ -243,7 +254,6 @@ var plugin = () => {
                 group.leaveGroup
             );
             $("#tab-customize #sound-setting .btn").click(e => {
-                debugger;
                 storage.setItem("sound", $(e.target).find(".radio").val());
             });
             $("#tab-customize #theme-setting .btn").click(e => {
@@ -483,6 +493,7 @@ var plugin = () => {
                     chrome_id: chrome_id,
                     nickname: $("#nickname").val(),
                     password: $("#password").val(),
+                    email: $("#email").val(),
                     action: "registerUser"
                 };
                 auth.register(params, data => {

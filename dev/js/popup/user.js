@@ -148,10 +148,30 @@ const user = new function() {
                 var data = common.getDataString(params);
 
                 request.get(data, response => {
+                    this.info = response.data;
                     callback(response);
                 });
             });
         }
+    };
+
+    this.checkEmailExist = () => {
+        if (!this.info.email) {
+            $("#email-modal").modal();
+        }
+    };
+
+    this.saveEmail = email => {
+        auth.getUserId(chrome_id => {
+            var params = {
+                chrome_id: chrome_id,
+                email: email,
+                action: "saveEmail"
+            };
+            request.post(params, response => {
+                console.log(response);
+            });
+        });
     };
 }();
 
