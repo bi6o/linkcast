@@ -491,9 +491,9 @@ var plugin = () => {
             auth.getUserId(chrome_id => {
                 var params = {
                     chrome_id: chrome_id,
-                    nickname: $("#nickname").val(),
-                    password: $("#password").val(),
-                    email: $("#email").val(),
+                    nickname: $("#r-nickname").val(),
+                    password: $("#r-password").val(),
+                    email: $("#r-email").val(),
                     action: "registerUser"
                 };
                 auth.register(params, data => {
