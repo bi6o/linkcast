@@ -116,7 +116,7 @@ var plugin = () => {
 
             $(".email-btn").click(e => {
                 var email = $("#add-email").val();
-                var re = /^(([^<>()[]\.,;:s@"]+(.[^<>()[]\.,;:s@"]+)*)|(".+"))@(([[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}])|(([a-zA-Z-0-9]+.)+[a-zA-Z]{2,}))$/gim;
+                var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 if (re.test(email)) {
                     //save it
                     user.saveEmail(email);
@@ -496,9 +496,10 @@ var plugin = () => {
                     email: $("#r-email").val(),
                     action: "registerUser"
                 };
-                auth.register(params, data => {
+                auth.register(params, response => {
+                    user.info = response.data;
                     user.welcomeUser(params.nickname);
-                    user.afterLogin(data);
+                    user.afterLogin(response.data);
                     main.bgPage.updateVersion();
                 });
             });
@@ -514,9 +515,10 @@ var plugin = () => {
                     password: $("#password").val(),
                     action: "loginUser"
                 };
-                auth.login(params, data => {
+                auth.login(params, response => {
+                    user.info = response.data;
                     user.welcomeUser(params.nickname);
-                    user.afterLogin(data);
+                    user.afterLogin(response.data);
                     $("#profile-color").spectrum({
                         preferredFormat: "hsl",
                         color: user.info.color

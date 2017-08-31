@@ -27,7 +27,9 @@ const user = new function() {
         if (data.defaultGroup) {
             storage.setItem("defaultGroup", data.defaultGroup);
             storage.setItem("defaultGroupName", data.defaultGroupName);
-            storage.setItem("uid", data.uid);
+            storage.setItem("uid", data.id);
+            storage.setItem("chrome_id", data.chrome_id);
+
             $("#group-display").html(data.defaultGroupName);
             group.fetchGroups();
         }
@@ -169,7 +171,8 @@ const user = new function() {
                 action: "saveEmail"
             };
             request.post(params, response => {
-                console.log(response);
+                $("#email-modal").modal("hide");
+                message.show("Done! Enjoy Linkcast", "success");
             });
         });
     };
