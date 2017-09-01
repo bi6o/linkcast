@@ -166,7 +166,7 @@ const user = new function() {
             $(".no-confirm").hide();
             $(".no-email").show();
             $("#email-modal").modal();
-        } else if (!!this.info.verified) {
+        } else if (!parseInt(this.info.verified)) {
             $(".no-confirm").show();
             $(".no-email").hide();
             $("#email-modal").modal();
