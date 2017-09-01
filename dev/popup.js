@@ -70,7 +70,7 @@ var plugin = () => {
                     $(".authorized").removeClass("hide");
 
                     //check for email
-                    user.checkEmailExist();
+                    user.checkEmailSet();
                     /* Show notifications */
                     notification.getNotifications();
                     group.fetchGroups();
@@ -113,7 +113,10 @@ var plugin = () => {
             $("#default-group").click(() => {
                 group.makeGroupDefault("#settings #groups-dd");
             });
-
+            $("#change-email").click(e => {
+                e.preventDefault();
+                user.editUnverifiedEmail();
+            });
             $(".email-btn").click(e => {
                 var email = $("#add-email").val();
                 var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

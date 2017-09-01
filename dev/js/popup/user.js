@@ -19,6 +19,10 @@ const user = new function() {
         $("#profile-color").val(this.info.color);
         $("#bio").val(this.info.bio);
         $(".step1").hide();
+        $("#profile-color").spectrum({
+            preferredFormat: "hsl",
+            color: this.info.color
+        });
     };
     /**
      * Some post processing after login/registration
@@ -157,10 +161,23 @@ const user = new function() {
         }
     };
 
-    this.checkEmailExist = () => {
+    this.checkEmailSet = () => {
         if (!this.info.email) {
+            $(".no-confirm").hide();
+            $(".no-email").show();
             $("#email-modal").modal();
+        } else if (!!this.info.verified) {
+            $(".no-confirm").show();
+            $(".no-email").hide();
+            $("#email-modal").modal();
+        } else {
+            $("#email-modal").modal("hide");
         }
+    };
+
+    this.editUnverifiedEmail = () => {
+        $(".no-email").show();
+        $(".no-confirm").hide();
     };
 
     this.saveEmail = email => {
@@ -171,8 +188,9 @@ const user = new function() {
                 action: "saveEmail"
             };
             request.post(params, response => {
-                $("#email-modal").modal("hide");
-                message.show("Done! Enjoy Linkcast", "success");
+                //message.show("Done! Enjoy Linkcast", "success");
+                user.info = response.data;
+                user.checkEmailSet();
             });
         });
     };

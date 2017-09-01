@@ -45,11 +45,11 @@ module.exports = {
                                 "../dev/manifest.json"
                             );
                             //publish to chrome
-                            // publisher.publish({
-                            //     archive: params.target,
-                            //     tokens: tokens,
-                            //     manifestPath: manifest
-                            // });
+                            publisher.publish({
+                                archive: params.target,
+                                tokens: tokens,
+                                manifestPath: manifest
+                            });
                         }
                     });
                 }
