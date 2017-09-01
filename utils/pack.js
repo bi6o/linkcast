@@ -24,7 +24,7 @@ module.exports = function(params, isDev) {
     //replace background
     var data = readFile(params, "dev/background.js");
     data = data.replace(appConfig.dev, appConfig.prod);
-    writeFileToDisk(params, "dev/background.js", data);
+    writeFileToDisk(params, "build/background.js", data);
 
     //remove js folder
     exec("rm -rf " + path.join(params.root, "build/js"), function(
