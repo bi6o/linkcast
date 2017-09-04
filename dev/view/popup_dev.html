@@ -12,7 +12,14 @@
 <body>
     <div class="container">
 
-        <!-- view/navigation.html  -->
+        <ul class="nav nav-tabs main-nav">
+            <li class="active"><a href="#tab-notifications" data-toggle="tab">Notifications</a><span class="short-border" /></li>
+            <li class="authorized"><a href="#tab-feed" data-toggle="tab">Feed</a><span class="short-border" /></li>
+            <li class="authorized"><a href="#tab-post" data-toggle="tab">Post</a><span class="short-border" /></li>
+            <li class="authorized"><a href="#tab-links" data-toggle="tab">Links</a><span class="short-border" /></li>
+            <li class="authorized"><a href="#tab-groups" data-toggle="tab">Groups</a><span class="short-border" /></li>
+            <li><a href="#tab-settings" data-toggle="tab">Settings</a><span class="short-border" /></li>
+        </ul>
 
         <div class="tab-content main-content-area">
 
@@ -22,16 +29,58 @@
 
             <!-- view/post.html  -->
 
-            <!-- view/links.html  -->
+            <div class="tab-pane fade" id="tab-links">
+                <ul class="nav nav-pills nav nav-pills secondary-nav">
+                    <li class="active"><a href="#tab-favourites" class="active pill-item" data-toggle="pill">Favourites</a></li>
+                    <li><a href="#tab-sent" class="pill-item" data-toggle="pill">Sent</a></li>
+                    <!-- <li><a href="#tab-received" class="pill-item" data-toggle="pill">Received</a></li> -->
+                </ul>
+                <div class="tab-content inner-tab-content">
+                    <div class="tab-pane active" id="tab-favourites">
+                        <div class="scroll">
+                            <div class="items  user-enabled"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-sent">
+                        <div class="scroll">
+                            <div class="items"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- view/groups.html  -->
+            <div class="tab-pane fade" id="tab-groups">
+                <ul class="nav nav-pills nav nav-pills secondary-nav">
+                    <li class="active"><a href="#tab-public-groups" class="pill-item" data-toggle="pill">Public</a></li>
+                    <li><a href="#tab-private-groups" class="pill-item" data-toggle="pill">Private</a></li>
+                    <li><a href="#tab-create-groups" class="pill-item" data-toggle="pill">Create</a></li>
+                    <li><a href="#tab-manage-groups" class="pill-item" data-toggle="pill">Manage</a></li>
+                </ul>
+                <div class="tab-content inner-tab-content">
+                    <!--include 'groups/public.html' -->
+                    <!--include 'groups/private.html' -->
+                    <!--include 'groups/create.html' -->
+                    <!--include 'groups/manage.html' -->
+                </div>
+            </div>
 
-            <!-- view/settings.html  -->
+            <div class="tab-pane fade" id="tab-settings">
+                <ul class="nav nav-pills nav nav-pills secondary-nav">
+                    <li class="active"><a href="#tab-profile" class="pill-item" data-toggle="pill">Profile</a></li>
+                    <li><a href="#tab-customize" class="pill-item" data-toggle="pill">Customize</a></li>
+                    <li><a href="#tab-about" class="pill-item" data-toggle="pill">About</a></li>
+                </ul>
+                <div class="tab-content inner-tab-content">
+                    <!--include 'settings/profile.html' -->
+                    <!--include 'settings/customize.html' -->
+                    <!--include 'settings/about.html' -->
+                </div>
+            </div>
 
 
         </div>
 
-        <!-- view/system-messages.html  -->
+        <div id="msg" class="hide"></div>
 
     </div>
     <!--include view/modals/item.html  -->
@@ -47,7 +96,11 @@
 
     <!-- view/templates/comment.html  -->
 
-    <!-- view/templates/notification.html  -->
+    <div class="scroll tab-pane fade active in" id="tab-notifications">
+        <div class="items user-enabled">
+            <div id="loader" class="preloader"><img src="public/images/loader.svg"></div>
+        </div>
+    </div>
 
     <script src="env.js"></script>
     <!-- replace:[js] -->
