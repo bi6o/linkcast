@@ -11,7 +11,10 @@ module.exports = new function() {
         var $handle = $(e.target).parents(".item");
         var $comments = $handle.find(".comments-section .comments");
         var item_id = $handle.data("id");
-        var comment = $handle.find(".comment-input").val().trim();
+        var comment = $handle
+            .find(".comment-input")
+            .val()
+            .trim();
 
         if (e.keyCode == 13 && comment.length > 0) {
             $handle.find(".comment-input").val("");

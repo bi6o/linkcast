@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600');
 body {
-    font-family: 'Open Sans', "Lucida Grande", "Lucida Sans Unicode",
+    font-family: "Open Sans", "Lucida Grande", "Lucida Sans Unicode",
         "Lucida Sans", Garuda, Verdana, Tahoma, sans-serif;
     /*"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Garuda, Verdana, Tahoma, sans-serif;*/
     line-height: 1.6;
@@ -216,7 +216,7 @@ header #img-logo {
     padding: 16px 24px;
 }
 
-.header {
+.footer {
     position: relative;
     height: 40px;
     padding: 8px;
@@ -291,7 +291,7 @@ header #img-logo {
 }
 
 ::-webkit-scrollbar-thumb {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 }
 
 /* notification */
@@ -612,7 +612,7 @@ License: MIT
     cursor: pointer;
     border: 1px solid black;
     background: white;
-    opacity: .8;
+    opacity: 0.8;
 }
 
 .sp-alpha {
@@ -710,8 +710,8 @@ License: MIT
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(GradientType = 1, startColorstr=#FFFFFFFF, endColorstr=#00CC9A81)";
     filter: progid:DXImageTransform.Microsoft.gradient(
             GradientType=1,
-            startColorstr='#FFFFFFFF',
-            endColorstr='#00CC9A81'
+            startColorstr="#FFFFFFFF",
+            endColorstr="#00CC9A81"
         );
 }
 
@@ -738,8 +738,8 @@ License: MIT
     background-image: linear-gradient(to top, #000, rgba(204, 154, 129, 0));
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00CC9A81, endColorstr=#FF000000)";
     filter: progid:DXImageTransform.Microsoft.gradient(
-            startColorstr='#00CC9A81',
-            endColorstr='#FF000000'
+            startColorstr="#00CC9A81",
+            endColorstr="#FF000000"
         );
 }
 
@@ -816,48 +816,48 @@ License: MIT
 .sp-1 {
     height: 17%;
     filter: progid:DXImageTransform.Microsoft.gradient(
-            startColorstr='#ff0000',
-            endColorstr='#ffff00'
+            startColorstr="#ff0000",
+            endColorstr="#ffff00"
         );
 }
 
 .sp-2 {
     height: 16%;
     filter: progid:DXImageTransform.Microsoft.gradient(
-            startColorstr='#ffff00',
-            endColorstr='#00ff00'
+            startColorstr="#ffff00",
+            endColorstr="#00ff00"
         );
 }
 
 .sp-3 {
     height: 17%;
     filter: progid:DXImageTransform.Microsoft.gradient(
-            startColorstr='#00ff00',
-            endColorstr='#00ffff'
+            startColorstr="#00ff00",
+            endColorstr="#00ffff"
         );
 }
 
 .sp-4 {
     height: 17%;
     filter: progid:DXImageTransform.Microsoft.gradient(
-            startColorstr='#00ffff',
-            endColorstr='#0000ff'
+            startColorstr="#00ffff",
+            endColorstr="#0000ff"
         );
 }
 
 .sp-5 {
     height: 16%;
     filter: progid:DXImageTransform.Microsoft.gradient(
-            startColorstr='#0000ff',
-            endColorstr='#ff00ff'
+            startColorstr="#0000ff",
+            endColorstr="#ff00ff"
         );
 }
 
 .sp-6 {
     height: 17%;
     filter: progid:DXImageTransform.Microsoft.gradient(
-            startColorstr='#ff00ff',
-            endColorstr='#ff0000'
+            startColorstr="#ff00ff",
+            endColorstr="#ff0000"
         );
 }
 
@@ -916,7 +916,7 @@ License: MIT
     right: -1px;
     border: 1px solid #000;
     background: white;
-    opacity: .8;
+    opacity: 0.8;
 }
 
 /*
