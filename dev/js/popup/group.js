@@ -82,7 +82,7 @@ module.exports = new function() {
                 mode: mode,
                 name: name,
                 group_rights: $(
-                    "#tab-groups .tab-pane.active  #group-rights .radio:checked"
+                    "#tab-groups .tab-pane.active  #group-rights .active input"
                 ).val()
             };
 
