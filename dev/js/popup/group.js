@@ -202,7 +202,9 @@ module.exports = new function() {
     };
     this.makeGroupDefault = selector => {
         var defaultGroup = $(selector).val();
-        var name = $(selector).find("option:selected").text();
+        var name = $(selector)
+            .find("option:selected")
+            .text();
         storage.setItem("defaultGroup", defaultGroup);
         storage.setItem("defaultGroupName", name);
         message.show("Default group set to " + name, "success");
@@ -241,7 +243,9 @@ module.exports = new function() {
                 request.get(data, data => {
                     var html = "";
                     data.forEach((item, i) => {
-                        var $html = $("#users-template").clone().find("tbody");
+                        var $html = $("#users-template")
+                            .clone()
+                            .find("tbody");
                         var remove = item.id == admin_id ? "" : "remove";
                         html += $html
                             .html()
@@ -368,9 +372,12 @@ module.exports = new function() {
         let $option = $("#tab-manage-groups #groups-dd option:selected");
 
         //update group name
-        $handle
-            .find("#inputGroupCreate")
-            .val($option.text().replace("(admin)", "").trim());
+        $handle.find("#inputGroupCreate").val(
+            $option
+                .text()
+                .replace("(admin)", "")
+                .trim()
+        );
         //update group desc
         $handle.find("#inputGrpDesc").val($option.data("desc"));
         //update private/public visibility
