@@ -224,7 +224,7 @@ setInterval(function() {
             }
         });
     }
-}, 10000);
+}, 60000);
 
 var sendClickedStat = function(data) {
     $.post(endpoint, data);
