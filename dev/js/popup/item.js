@@ -4,6 +4,7 @@ const auth = require("./auth");
 const common = require("../common/common");
 const message = require("./message");
 const _group = require("./group");
+const notification = require("./notification");
 
 String.prototype.replaceArray = function(find, replace) {
     var replaceString = this;
@@ -50,16 +51,20 @@ module.exports = new function() {
                     action: "readTracks"
                 };
                 let data = common.getDataString(params);
+
                 request.get(data, data => {
                     $("#loader").remove();
 
                     this.totalPages = data.pages;
-
+                    var html = "";
                     if (data.rows.length === 0) {
                         html = "Nothing found.";
                     }
-
-                    var html = this.getItemMarkup(handle, data, uid);
+                    if (handle == "#tab-notifications") {
+                        html = notification.getItemMarkup(data, uid);
+                    } else {
+                        html = this.getItemMarkup(handle, data, uid);
+                    }
 
                     if (updateType === "append") {
                         $(handle + " div.items").append(html);

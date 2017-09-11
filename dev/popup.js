@@ -71,8 +71,9 @@ var plugin = () => {
 
                     //check for email
                     user.checkEmailSet();
-                    /* Show notifications */
-                    notification.getNotifications();
+                    /* Trigger the first tab */
+                    let tabId = $(".main-nav li.active a").attr("href");
+                    item.fetchItems(tabId, "html", null);
                     group.fetchGroups();
                     main._activateScroll();
                     main._resetNotification();
@@ -324,6 +325,7 @@ var plugin = () => {
                     group.groupNotSetMessage();
                 } else {
                     const targets = [
+                        "#tab-notifications",
                         "#tab-feed",
                         "#updates",
                         "#comments",
@@ -457,7 +459,7 @@ var plugin = () => {
 
         _activateScroll: () => {
             var $windows = $(
-                "#tab-feed .scroll, #tab-sent .scroll, #tab-favourites .scroll, #user-links .panel-body"
+                "#tab-notifications .scroll, #tab-feed .scroll, #tab-sent .scroll, #tab-favourites .scroll, #user-links .panel-body"
             );
 
             $windows.scroll(function(e) {
@@ -474,8 +476,10 @@ var plugin = () => {
                 if (scroll_top + height == scrollHeight && loading === true) {
                     item.page++;
                     if (item.page <= item.totalPages) {
+                        $(".processor").show(); //toggleClass("hide");
                         item.fetchItems(window_id, "append", null, html => {
                             loading = false;
+                            $(".processor").fadeOut(200); //.toggleClass("hide");
                         });
                     }
                 }

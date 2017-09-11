@@ -62,4 +62,31 @@ module.exports = new function() {
             });
         });
     };
+
+    this.getItemMarkup = (data, uid) => {
+        $("#loader").remove();
+        this.totalPages = data.pages;
+
+        var items = data.rows.map(item => {
+            let $html = this.getTemplate(item.type);
+            $html = $html.replace(/{(.*?)}/gi, function(variable) {
+                // convert {VAR} to VAR
+                variable = variable
+                    .substring(1, variable.length - 1)
+                    .toLowerCase();
+
+                if (variable == "created_at") {
+                    return moment(item.created_at)
+                        .add(moment().utcOffset(), "minutes")
+                        .fromNow();
+                } else if (item[variable]) {
+                    return item[variable];
+                } else {
+                    return "";
+                }
+            });
+            return $html;
+        });
+        return items;
+    };
 }();

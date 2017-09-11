@@ -301,7 +301,6 @@ header #img-logo {
     display: flex;
 }
 .notification-item .username {
-    flex: 1 0 0;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -327,6 +326,15 @@ header #img-logo {
     margin-right: 8px;
 }
 
+/* Backdrop */
+.backdrop {
+    position: absolute;
+    width: 784px;
+    height: 430px;
+    background: #000;
+    opacity: 0.6;
+    margin-top: 10px;
+}
 /*Modal*/
 
 .modal-dialog {
