@@ -45,13 +45,10 @@ body {
 }
 .fa-heart:before {
     content: "\f004";
-    color: #b33660;
 }
 .fa-group:before,
-.fa-users:before,
-.fa-user:before {
+.fa-users:before {
     color: dodgerblue;
-    margin: 0px 4px;
 }
 /**                                                 **
 * --------------------BUTTONS---------------------- *
@@ -172,6 +169,25 @@ label.radio-inline input[type="radio"]:checked ~ .circle {
     font-style: italic;
 }
 
+.notification-item .fa-heart {
+    color: #b33660;
+}
+.notification-item .fa-comment {
+    color: #1dac1d;
+}
+.notification-item .fa-link {
+    color: #348afd;
+}
+.notification-item .fa-user {
+    color: #fffe19;
+}
+.notification-item .fa-sign-in {
+    color: #f48468;
+}
+.strong {
+    font-weight: bold;
+    color: #ccc;
+}
 /**                                                 **
 * --------------------LINKS----------------------- *
 *-------------------------------------------------- */

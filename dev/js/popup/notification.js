@@ -18,7 +18,6 @@ module.exports = new function() {
             this.templates.wrapper = $("#notification-wrapper").html();
         }
         let wrapper = this.templates.wrapper;
-        //let template = this.templates[name];
         return wrapper.replace("{ITEM}", this.templates[name]);
     };
 
@@ -75,6 +74,47 @@ module.exports = new function() {
                     .substring(1, variable.length - 1)
                     .toLowerCase();
 
+                if (variable == "actors") {
+                    if (item.type == "new_group") {
+                        item.actors = item.nickname;
+                    }
+                    var actors = item[variable];
+                    var arr = actors.split(",").map(actor => {
+                        return "<span class='strong'>" + actor + "</span>";
+                    });
+                    var total = arr.length;
+
+                    switch (total) {
+                        case 1:
+                            return arr[0];
+                        case 2:
+                            return arr.join(" and ");
+                        case 3:
+                            let others = arr[2];
+                            return (
+                                arr.splice(0, 2).join(", ") +
+                                ` and <span class="strong ttip">1 other <span class="ttiptext">${others}</span></span>`
+                            );
+                        default: {
+                            let others = arr.splice(2).join(", ");
+                            return (
+                                arr.splice(0, 2).join(", ") +
+                                ` and <span class="strong ttip">${total -
+                                    3} others <span class="ttiptext">${others}</span></span>`
+                            );
+                        }
+                    }
+                }
+                if (variable == "title") {
+                    if (item[variable].length > 80) {
+                        return item[variable].slice(0, 80) + "...";
+                    }
+                }
+                if (variable == "comment") {
+                    if (item[variable].length > 60) {
+                        return item[variable].slice(0, 60) + "...";
+                    }
+                }
                 if (variable == "created_at") {
                     return moment(item.created_at)
                         .add(moment().utcOffset(), "minutes")

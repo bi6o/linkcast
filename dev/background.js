@@ -67,6 +67,15 @@ $.post = function(url, data, callback, async) {
     $.send(url, callback, "POST", query.join("&"), async);
 };
 
+var templates = {
+    link: "{NICKNAME} posted {TITLE} in {GROUP_NAME}",
+    like: "{NICKNAME} liked  {TITLE}",
+    comment: "{NICKNAME} commented - {COMMENT} on {NICKNAME}'s link",
+    joined_group: "{NICKNAME} joined the group {GROUP_NAME}",
+    joined_linkcast: "{NICKNAME} joined Linkcast",
+    new_group: "{NICKNAME} created a new group - {GROUP_NAME}"
+};
+
 var NEW_NOTIFICATION = false;
 /**
  * @param  Update noticcation count of the extension
@@ -132,6 +141,32 @@ var getTitle = function(linkCount, commentCount, word) {
     }
     return msg;
 };
+var getFormatedText = function(activity) {
+    //activity type
+    var type = activity.type;
+    var template = templates[type];
+    var text = template.replace(/{(.*?)}/gi, function(variable) {
+        // convert {VAR} to VAR
+        variable = variable.substring(1, variable.length - 1).toLowerCase();
+
+        return activity[variable];
+    });
+    return text;
+};
+var getEmoji = function(type) {
+    switch (type) {
+        case "like":
+            return "❤️";
+        case "link":
+            return "🔗";
+        case "comment":
+            return "🗣";
+        case "joined_linkcast":
+            return "🙍🏻‍";
+        case "joined_group":
+            return "👨‍👨‍👦‍👦";
+    }
+};
 //Start polling
 setInterval(function() {
     checkStorage();
@@ -143,9 +178,11 @@ setInterval(function() {
                 $.get(
                     endpoint,
                     {
+                        handle: "tab-notifications",
                         group: group,
-                        action: "getActivities",
+                        action: "readTracks",
                         bg: 1,
+                        count: null,
                         chrome_id: userid
                     },
                     function(response) {
@@ -188,13 +225,10 @@ setInterval(function() {
                                     } else if (activity.type == "comment") {
                                         commentCount++;
                                     }
-                                    var regex_clean = /<\/?[^>]+(>|$)/g;
+                                    var title = getFormatedText(activity);
                                     itemList.push({
-                                        title: activity.template.replace(
-                                            regex_clean,
-                                            ""
-                                        ),
-                                        message: activity.type
+                                        title: title,
+                                        message: getEmoji(activity.type)
                                     });
                                 });
                                 var title = getTitle(linkCount, commentCount);
@@ -224,7 +258,7 @@ setInterval(function() {
             }
         });
     }
-}, 60000);
+}, 10000);
 
 var sendClickedStat = function(data) {
     $.post(endpoint, data);
@@ -248,11 +282,14 @@ var updateVersion = function() {
                 //login the user
                 $.get(
                     endpoint,
-                    { chrome_id: response.userid, action: "fetchUserInfo" },
+                    {
+                        chrome_id: response.userid,
+                        action: "fetchUserInfo"
+                    },
                     function(response) {
                         var result = JSON.parse(result);
                         if (typeof localStorage.chrome_id == "undefined") {
-                            localStorage.nickname = result.data.nickname;
+                            localStorage.ACTORS = result.data.ACTORS;
                             localStorage.loggedIn = true;
                             localStorage.chrome_id = response.userid;
                             localStorage.richNotification = 1;
