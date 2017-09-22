@@ -8,6 +8,7 @@ window.jQuery = $;
 require("bootstrap");
 window.moment = require("moment");
 require("./js/color-picker");
+require("./js/jquery.tokeninput");
 
 const storage = require("./js/popup/storage");
 const request = require("./js/popup/request");
@@ -170,6 +171,11 @@ var plugin = () => {
                     console.log(msg);
                 });
             });
+            $(document).on("click", "a.withdraw-invite", group.withrawInvite);
+            $(document).on("click", ".invite-btn", group.inviteUsers);
+            $(document).on("click", "#send-invites", group.sendInvites);
+            $(document).on("click", "a.group-accept", group.acceptInvite);
+            $(document).on("click", "a.group-reject", group.rejectInvite);
             $(document).on("click", ".user-enabled .username", function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -249,11 +255,7 @@ var plugin = () => {
                 user.changePublicRights
             );
 
-            $("#tab-public-groups").on(
-                "click",
-                ".group-join",
-                group.joinPublicGroup
-            );
+            $(".tab-pane").on("click", ".group-join", group.joinPublicGroup);
             $("#tab-public-groups").on(
                 "click",
                 ".group-leave",
@@ -312,7 +314,6 @@ var plugin = () => {
          * @param  {event}
          */
         _tabChanged: e => {
-            console.log(2);
             e.preventDefault();
             var target = $(e.target).attr("href"); // activated tab
             item.page = 1;

@@ -73,7 +73,10 @@ var templates = {
     comment: "{NICKNAME} commented - {COMMENT} on {NICKNAME}'s link",
     joined_group: "{NICKNAME} joined the group {GROUP_NAME}",
     joined_linkcast: "{NICKNAME} joined Linkcast",
-    new_group: "{NICKNAME} created a new group - {GROUP_NAME}"
+    new_group: "{NICKNAME} created a new group - {GROUP_NAME}",
+    group_invite: "{NICKNAME} invited you to join {GROUP_NAME}",
+    group_invite_rejected:
+        "{NICKNAME} rejected your invite to join {GROUP_NAME}"
 };
 
 var NEW_NOTIFICATION = false;
@@ -124,27 +127,23 @@ var getNotifications = function(callback) {
     callback(countData);
 };
 
-var getTitle = function(linkCount, commentCount, word) {
+var getTitle = function(linkCount, commentCount, likeCount, others) {
     const getVerb = (count, word) => {
         return count > 1 ? word + "s" : word;
     };
-    var msg = "You have got ";
-    if (linkCount > 0) {
-        msg += linkCount + " " + getVerb(linkCount, "link");
-    }
-
-    if (commentCount > 0) {
-        if (linkCount > 0) {
-            msg += " and ";
-        }
-        msg += commentCount + " " + getVerb(commentCount, "comment");
-    }
-    return msg;
+    let totalNotifications = linkCount + commentCount + likeCount + others;
+    return `You have got ${totalNotifications} ${getVerb(
+        totalNotifications,
+        "notification"
+    )}`;
 };
 var getFormatedText = function(activity) {
     //activity type
     var type = activity.type;
     var template = templates[type];
+    if (!template) {
+        return "Couldn't decode the message. Maybe something very personal";
+    }
     var text = template.replace(/{(.*?)}/gi, function(variable) {
         // convert {VAR} to VAR
         variable = variable.substring(1, variable.length - 1).toLowerCase();
@@ -162,9 +161,17 @@ var getEmoji = function(type) {
         case "comment":
             return "🗣";
         case "joined_linkcast":
-            return "🙍🏻‍";
+            return "🙍🏻";
         case "joined_group":
             return "👨‍👨‍👦‍👦";
+        case "group_invite":
+            return "✉️";
+        case "group_invite_rejected":
+            return "😏";
+        case "linkcast":
+            return "📣";
+        default:
+            return "";
     }
 };
 //Start polling
@@ -216,14 +223,19 @@ setInterval(function() {
                             ) {
                                 var itemList = [];
                                 var linkCount = 0;
+                                var likeCount = 0;
                                 var commentCount = 0;
-
+                                var others = 0;
                                 data.rows.forEach(activity => {
                                     var type = "link";
                                     if (activity.type == "link") {
                                         linkCount++;
                                     } else if (activity.type == "comment") {
                                         commentCount++;
+                                    } else if (activity.type == "like") {
+                                        likeCount++;
+                                    } else {
+                                        others++;
                                     }
                                     var title = getFormatedText(activity);
                                     itemList.push({
@@ -231,7 +243,12 @@ setInterval(function() {
                                         message: getEmoji(activity.type)
                                     });
                                 });
-                                var title = getTitle(linkCount, commentCount);
+                                var title = getTitle(
+                                    linkCount,
+                                    commentCount,
+                                    likeCount,
+                                    others
+                                );
 
                                 var options = {
                                     type: "list",
@@ -287,7 +304,7 @@ var updateVersion = function() {
                         action: "fetchUserInfo"
                     },
                     function(response) {
-                        var result = JSON.parse(result);
+                        var result = JSON.parse(response);
                         if (typeof localStorage.chrome_id == "undefined") {
                             localStorage.ACTORS = result.data.ACTORS;
                             localStorage.loggedIn = true;

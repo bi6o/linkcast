@@ -73,7 +73,6 @@
         <span class="group">
             <i class="fa fa-users" aria-hidden="true"></i> {GROUP_NAME}
         </span>
-
     </div>
     <div class="item-meta">
         <i class="fa fa-sign-in" aria-hidden="true"></i>
@@ -96,10 +95,39 @@
 </div>
 
 <div class="hide" id="new_group">
-    <div>
+    <div class="group_row" data-gid="{GID}">
         <span>{ACTORS}</span>
         <span class="activity">
-                    created a new group <span style="color:#c53333; font-weight: bold"> {GROUP_NAME}</span>
+            created a new group <span style="color:#c53333; font-weight: bold"> {GROUP_NAME}.</span>
+        <a href="#" class="group-join green {HIDEJOIN}"> Join Now</a>
+        </span>
+    </div>
+    <div class="item-meta">
+        <i class="fa fa-users" aria-hidden="true"></i>
+        <span class="comment-date grey">{CREATED_AT}</span>
+    </div>
+</div>
+
+<div class="hide" id="group_invite">
+    <div class="group_row" data-aid="{ID}" data-gid="{GID}">
+        <span class="strong">{ADMIN}</span>
+        <span class="activity">
+                invited you to join <span style="font-weight: bold"> {GROUP_NAME}.</span>
+        <a href="#" class="group-accept green {GROUPINVITE}"> Accept</a> |
+        <a href="#" class="group-reject red {GROUPINVITE}"> Reject</a>
+        </span>
+    </div>
+    <div class="item-meta">
+        <i class="fa fa-users" aria-hidden="true"></i>
+        <span class="comment-date grey">{CREATED_AT}</span>
+    </div>
+</div>
+
+<div class="hide" id="group_invite_rejected">
+    <div class="group_row" data-aid="{ID}" data-gid="{GID}">
+        <span class="strong">{NICKNAME}</span>
+        <span class="activity">
+                    rejected your invite to join <span style="font-weight: bold"> {GROUP_NAME}.</span>
         </span>
     </div>
     <div class="item-meta">
@@ -109,7 +137,13 @@
 </div>
 
 <div class="hide" id="linkcast">
-    <s>{ACTORS}</span> -
-        <span>Would you like to have a shoutbox for random dialogs ?</span>
-        </strong>
+    <div class="announcement">
+        <div class="linkcast-msg" style="color:{LCOLOR}">
+            {ACTORS} - {TITLE}
+        </div>
+        <div class="item-meta">
+            <i class="fa fa-bullhorn blink_me" aria-hidden="true"></i>
+            <span class="comment-date grey">{CREATED_AT}</span>
+        </div>
+    </div>
 </div>
