@@ -2,6 +2,7 @@ var auth = require("./auth");
 var request = require("./request");
 var user = require("./user");
 var common = require("../common/common");
+var _group = require("./group");
 
 module.exports = new function() {
     this.page = 1;
@@ -12,10 +13,14 @@ module.exports = new function() {
 
     this.getTemplate = name => {
         if (!this.templates[name]) {
-            this.templates[name] = $("#" + name).html();
+            this.templates[name] = $("#" + name)
+                .clone()
+                .html();
         }
         if (!this.templates.wrapper) {
-            this.templates.wrapper = $("#notification-wrapper").html();
+            this.templates.wrapper = $("#notification-wrapper")
+                .clone()
+                .html();
         }
         let wrapper = this.templates.wrapper;
         return wrapper.replace("{ITEM}", this.templates[name]);
@@ -100,18 +105,27 @@ module.exports = new function() {
                             return (
                                 arr.splice(0, 2).join(", ") +
                                 ` and <span class="strong ttip">${total -
-                                    3} others <span class="ttiptext">${others}</span></span>`
+                                    2} others <span class="ttiptext">${others}</span></span>`
                             );
                         }
                     }
                 }
-                if (variable == "title") {
-                    if (item[variable].length > 80) {
+                if (variable == "title" && item.type != "linkcast") {
+                    if (item[variable] && item[variable].length > 80) {
                         return item[variable].slice(0, 80) + "...";
                     }
                 }
+                if (variable == "hidejoin") {
+                    let joined =
+                        _group.groups.filter(
+                            group => item.group_name == group.gname
+                        ).length > 0;
+                    if (joined) {
+                        return "hide";
+                    }
+                }
                 if (variable == "comment") {
-                    if (item[variable].length > 60) {
+                    if (item[variable] && item[variable].length > 60) {
                         return item[variable].slice(0, 60) + "...";
                     }
                 }

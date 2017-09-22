@@ -136,7 +136,7 @@
         <div class="form-group">
             <label class="control-label col-sm-3 required" for="grpPwd">Group password</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control" id="grpPwd">
+                <input type="text" class="form-control" type="password" id="grpPwd">
             </div>
         </div>
         <div class="form-group">
@@ -204,7 +204,8 @@
     </div>
 </div>
                     <div class="tab-pane" id="tab-manage-groups">
-    <p>You can manage the groups for which are you are the admin.</p>
+    <p>You can manage the groups for which are you are the admin.
+        <button class="invite-btn btn btn-sm btn-success">Invite</button></p>
 
     <div class="row">
         <div class="col-sm-6 form-horizontal">
@@ -391,12 +392,8 @@
                 <h6 class="modal-title"></h6>
             </div>
             <div class="modal-body">
-                <div class="panel panel-primary">
-                    <div class="panel-body">
-                        <div class="items">
+                <div class="items">
 
-                        </div>
-                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -449,6 +446,42 @@
             </div>
             <div class="modal-footer">
 
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+    <div id="invite-modal" class="modal fade" tabindex="-1" role="dialog" data-gid="">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h6 class="modal-title">Users</h6>
+            </div>
+            <div class="modal-body user-enabled">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <h6># Send Invites</h6>
+                        <input type="text" id="tags-input-send-invites" class="form-control" />
+                    </div>
+                    <div class="col-xs-6">
+                        <h6># Edit Pending Invites</h6>
+                        <div id="sent-invites">
+
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="send-invites" class="btn btn-default btn-sm">Send Invites</button>
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -532,6 +565,13 @@
     </div>
 </div>
 
+    <div class="hide" id="invite-template">
+    <div class="invite-item" data-id="{}">
+        <span class="invite-user" style="color:{COLOR}">{USER_NAME}</span>
+        <span class="invite-status"><input data-id={USER_ID} type="checkbox" {STATUS}/></span>
+    </div>
+</div>
+
     <div class="hide" id="notification-wrapper">
     <div class="notification-item clearfix" data-id="{ITEM_ID}">
         <div>
@@ -607,7 +647,6 @@
         <span class="group">
             <i class="fa fa-users" aria-hidden="true"></i> {GROUP_NAME}
         </span>
-
     </div>
     <div class="item-meta">
         <i class="fa fa-sign-in" aria-hidden="true"></i>
@@ -630,10 +669,26 @@
 </div>
 
 <div class="hide" id="new_group">
-    <div>
+    <div class="group_row" data-gid="{GID}">
         <span>{ACTORS}</span>
         <span class="activity">
-                    created a new group <span style="color:#c53333; font-weight: bold"> {GROUP_NAME}</span>
+            created a new group <span style="color:#c53333; font-weight: bold"> {GROUP_NAME}.</span>
+        <a href="#" class="group-join green {HIDEJOIN}"> Join Now</a>
+        </span>
+    </div>
+    <div class="item-meta">
+        <i class="fa fa-users" aria-hidden="true"></i>
+        <span class="comment-date grey">{CREATED_AT}</span>
+    </div>
+</div>
+
+<div class="hide" id="group_invite">
+    <div class="group_row" data-aid="{ID}" data-gid="{GID}">
+        <span class="strong">{ADMIN}</span>
+        <span class="activity">
+                invited you to join <span style="font-weight: bold"> {GROUP_NAME}.</span>
+        <a href="#" class="group-accept green {GROUPINVITE}"> Accept</a> |
+        <a href="#" class="group-reject red {GROUPINVITE}"> Reject</a>
         </span>
     </div>
     <div class="item-meta">
@@ -643,9 +698,15 @@
 </div>
 
 <div class="hide" id="linkcast">
-    <s>{ACTORS}</span> -
-        <span>Would you like to have a shoutbox for random dialogs ?</span>
-        </strong>
+    <div class="announcement">
+        <div class="linkcast-msg" style="color:{LCOLOR}">
+            {ACTORS} - {TITLE}
+        </div>
+        <div class="item-meta">
+            <i class="fa fa-bullhorn blink_me" aria-hidden="true"></i>
+            <span class="comment-date grey">{CREATED_AT}</span>
+        </div>
+    </div>
 </div>
 
 

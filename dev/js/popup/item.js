@@ -22,6 +22,7 @@ module.exports = new function() {
     this.page = 1;
 
     this.userPage = 1;
+
     this.totalUserPages = 0;
     /**
      * Total number of pages available
