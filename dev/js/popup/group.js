@@ -463,7 +463,27 @@ module.exports = new function() {
         });
     };
 
-    this.rejectInvite = e => {};
+    this.rejectInvite = e => {
+        let $item = $(e.currentTarget).parents(".group_row");
+        var $notificationItem = $(e.currentTarget).parents(
+            ".notification-item"
+        );
+
+        auth.getUserId(chrome_id => {
+            var params = {
+                group_id: $item.data("gid"),
+                activity_id: $item.data("aid"),
+                chrome_id: chrome_id,
+                action: "rejectGroupInvite"
+            };
+            params = common.getDataString(params);
+            request.post(params, data => {
+                $notificationItem.remove();
+                message.show(data.msg, "success");
+            });
+        });
+    };
+
     this.sendInvites = () => {
         let invites = this.invites.map(user => {
             return user.id;
