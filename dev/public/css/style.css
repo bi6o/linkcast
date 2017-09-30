@@ -505,6 +505,12 @@ h3 {
     height: 385px;
 }
 
+#tab-feed .invite-btn {
+    cursor: pointer;
+    color: #337ab7;
+    text-decoration: underline;
+}
+
 .tab-content {
     height: 100%;
     flex: 1;
