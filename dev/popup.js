@@ -8,6 +8,7 @@ window.jQuery = $;
 require("bootstrap");
 window.moment = require("moment");
 require("./js/color-picker");
+require("./js/jquery.tokeninput");
 
 const storage = require("./js/popup/storage");
 const request = require("./js/popup/request");
@@ -71,8 +72,9 @@ var plugin = () => {
 
                     //check for email
                     user.checkEmailSet();
-                    /* Show notifications */
-                    notification.getNotifications();
+                    /* Trigger the first tab */
+                    let tabId = $(".main-nav li.active a").attr("href");
+                    item.fetchItems(tabId, "html", null);
                     group.fetchGroups();
                     main._activateScroll();
                     main._resetNotification();
@@ -169,6 +171,11 @@ var plugin = () => {
                     console.log(msg);
                 });
             });
+            $(document).on("click", "a.withdraw-invite", group.withrawInvite);
+            $(document).on("click", ".invite-btn", group.inviteUsers);
+            $(document).on("click", "#send-invites", group.sendInvites);
+            $(document).on("click", "a.group-accept", group.acceptInvite);
+            $(document).on("click", "a.group-reject", group.rejectInvite);
             $(document).on("click", ".user-enabled .username", function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -198,7 +205,9 @@ var plugin = () => {
             });
             $(document).on("click", "a.group-name", function(e) {
                 e.preventDefault();
-                let gid = $(this).parents("tr").data("gid");
+                let gid = $(this)
+                    .parents("tr")
+                    .data("gid");
                 group.getUsers(gid, user.info.id, (html, gname) => {
                     $("#users-modal .modal-title").html(gname);
                     $("#users-modal .wrapper").html(html);
@@ -246,27 +255,35 @@ var plugin = () => {
                 user.changePublicRights
             );
 
-            $("#tab-public-groups").on(
-                "click",
-                ".group-join",
-                group.joinPublicGroup
-            );
+            $(".tab-pane").on("click", ".group-join", group.joinPublicGroup);
             $("#tab-public-groups").on(
                 "click",
                 ".group-leave",
                 group.leaveGroup
             );
             $("#tab-customize #sound-setting .btn").click(e => {
-                storage.setItem("sound", $(e.target).find(".radio").val());
+                storage.setItem(
+                    "sound",
+                    $(e.target)
+                        .find(".radio")
+                        .val()
+                );
             });
             $("#tab-customize #theme-setting .btn").click(e => {
-                storage.setItem("theme", $(e.target).find(".radio").val());
+                storage.setItem(
+                    "theme",
+                    $(e.target)
+                        .find(".radio")
+                        .val()
+                );
                 self.setTheme();
             });
             $("#tab-customize #rich-notification .btn").click(e => {
                 storage.setItem(
                     "richNotification",
-                    $(e.target).find(".radio").val()
+                    $(e.target)
+                        .find(".radio")
+                        .val()
                 );
             });
             // $("#tab-customize #sound-setting .radio").click(e => {
@@ -286,7 +303,9 @@ var plugin = () => {
             var theme = storage.getItem("theme");
             if (theme != null) {
                 $("#theme").attr("href", "css/themes/" + theme + ".css");
-                $("body").removeAttr("class").addClass(theme);
+                $("body")
+                    .removeAttr("class")
+                    .addClass(theme);
             }
         },
 
@@ -295,7 +314,6 @@ var plugin = () => {
          * @param  {event}
          */
         _tabChanged: e => {
-            console.log(2);
             e.preventDefault();
             var target = $(e.target).attr("href"); // activated tab
             item.page = 1;
@@ -308,6 +326,7 @@ var plugin = () => {
                     group.groupNotSetMessage();
                 } else {
                     const targets = [
+                        "#tab-notifications",
                         "#tab-feed",
                         "#updates",
                         "#comments",
@@ -319,7 +338,9 @@ var plugin = () => {
                     if (targets.indexOf(target) !== -1) {
                         //take care of sub tabs which are default
                         if (target === "#tab-links") {
-                            target = $(target).find("li.active a").attr("href");
+                            target = $(target)
+                                .find("li.active a")
+                                .attr("href");
                         }
                         item.fetchItems(target, "html", null);
                     } else if (target === "#tab-groups") {
@@ -439,7 +460,7 @@ var plugin = () => {
 
         _activateScroll: () => {
             var $windows = $(
-                "#tab-feed .scroll, #tab-sent .scroll, #tab-favourites .scroll, #user-links .panel-body"
+                "#tab-notifications .scroll, #tab-feed .scroll, #tab-sent .scroll, #tab-favourites .scroll, #user-links .panel-body"
             );
 
             $windows.scroll(function(e) {
@@ -448,12 +469,18 @@ var plugin = () => {
                 var scrollHeight = $(this)[0].scrollHeight;
 
                 var loading = true;
-                var window_id = "#" + $(this).parent().attr("id");
+                var window_id =
+                    "#" +
+                    $(this)
+                        .parent()
+                        .attr("id");
                 if (scroll_top + height == scrollHeight && loading === true) {
                     item.page++;
                     if (item.page <= item.totalPages) {
+                        $(".processor").show(); //toggleClass("hide");
                         item.fetchItems(window_id, "append", null, html => {
                             loading = false;
+                            $(".processor").fadeOut(200); //.toggleClass("hide");
                         });
                     }
                 }

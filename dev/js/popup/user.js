@@ -70,7 +70,9 @@ const user = new function() {
         var $handle = $(e.target).parents(".user-item");
         var user_id = $handle.data("id");
         var group_id = $("#tab-manage-groups #groups-dd").val();
-        var group_rights = $(e.target).find(".radio").val();
+        var group_rights = $(e.target)
+            .find(".radio")
+            .val();
 
         auth.getUserId(chrome_id => {
             var params = {

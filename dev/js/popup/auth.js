@@ -7,20 +7,22 @@ module.exports = new function() {
     this.login = (params, callback) => {
         if (params.nickname.length > 0 && params.password.length > 0) {
             let data = common.getDataString(params);
-            request.post(data, data => {
-                if (data.flag) {
+            request.post(data, response => {
+                if (response.flag) {
                     //store some basic information in the localStorage
                     storage.setItem("nickname", params.nickname);
                     storage.setItem("loggedIn", true);
-                    storage.setItem("chrome_id", data.chrome_id);
+                    storage.setItem("chrome_id", response.data.chrome_id);
 
-                    chrome.storage.sync.set({ userid: data.chrome_id });
+                    chrome.storage.sync.set({
+                        userid: response.data.chrome_id
+                    });
                     $(".authorized").removeClass("hide");
                     if (typeof callback === "function") {
-                        callback(data);
+                        callback(response);
                     }
                 } else {
-                    message.show(data.msg, "warning");
+                    message.show(response.msg, "warning");
                 }
             });
         }
@@ -31,17 +33,17 @@ module.exports = new function() {
         if (params.nickname.length > 0 && params.password.length > 0) {
             let data = common.getDataString(params);
 
-            request.post(data, data => {
-                if (data.flag) {
+            request.post(data, response => {
+                if (response.flag) {
                     storage.setItem("nickname", params.nickname);
                     storage.setItem("loggedIn", true);
-                    storage.setItem("chrome_id", data.chrome_id);
+                    storage.setItem("chrome_id", params.chrome_id);
                     $(".authorized").removeClass("hide");
                     if (typeof callback === "function") {
-                        callback(data);
+                        callback(response);
                     }
                 } else {
-                    message.show(data.msg, "warning");
+                    message.show(response.msg, "warning");
                 }
             });
         }

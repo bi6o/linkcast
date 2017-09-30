@@ -5,39 +5,43 @@ var message = require("./message");
 var storage = require("./storage");
 
 module.exports = new function() {
-    this.fetchGroups = () => {
-        auth.getUserId(chrome_id => {
-            let params = {
-                chrome_id: chrome_id,
-                action: "fetchUserGroups"
-            };
-            var data = common.getDataString(params);
-            var groups = {
-                all: "<option value='0'>All</option>",
-                withPostAccess: "",
-                admin: ""
-            };
+    this.groups = [];
+    (this.invites = []),
+        (this.fetchGroups = callback => {
+            auth.getUserId(chrome_id => {
+                let params = {
+                    chrome_id: chrome_id,
+                    action: "fetchUserGroups"
+                };
+                var data = common.getDataString(params);
+                var groups = {
+                    all: "<option value='0'>All</option>",
+                    withPostAccess: "",
+                    admin: ""
+                };
 
-            request.get(data, data => {
-                var html = "<option value='0'>Select</option>";
-
-                data.forEach(item => {
-                    let options = this.getGroupsTemplate(item);
-                    if (item.group_rights == "can_post") {
-                        groups.withPostAccess += options;
+                request.get(data, data => {
+                    var html = "<option value='0'>Select</option>";
+                    this.groups = data;
+                    data.forEach(item => {
+                        let options = this.getGroupsTemplate(item);
+                        if (item.group_rights == "can_post") {
+                            groups.withPostAccess += options;
+                        }
+                        if (item.admin === item.uid) {
+                            groups.admin += options;
+                        }
+                        groups.all += options;
+                    });
+                    $("#tab-feed #groups-dd").html(groups.all);
+                    $("#tab-post #groups-dd").html(groups.withPostAccess);
+                    $("#tab-groups #groups-dd").html(groups.admin);
+                    if (typeof callback == "function") {
+                        callback();
                     }
-                    if (item.admin === item.uid) {
-                        groups.admin += options;
-                    }
-                    groups.all += options;
                 });
-                $("#tab-feed #groups-dd").html(groups.all);
-                $("#tab-post #groups-dd").html(groups.withPostAccess);
-                $("#tab-groups #groups-dd").html(groups.admin);
-                //this.groupDDChanged();
             });
         });
-    };
     this.getGroupsTemplate = item => {
         var admin = false;
         var defaultGroup = storage.getItem("defaultGroup");
@@ -70,6 +74,9 @@ module.exports = new function() {
                 "#tab-groups .tab-pane.active #inputGroupCreate"
             ).val();
             var desc = $("#tab-groups .tab-pane.active  #inputGrpDesc").val();
+            var group_password = $(
+                "#tab-groups .tab-pane.active  #group-password"
+            ).val();
             var is_public = $(
                 "#tab-groups .tab-pane.active  #group-visibility .radio:checked"
             ).val();
@@ -82,8 +89,9 @@ module.exports = new function() {
                 mode: mode,
                 name: name,
                 group_rights: $(
-                    "#tab-groups .tab-pane.active  #group-rights .radio:checked"
-                ).val()
+                    "#tab-groups .tab-pane.active  #group-rights .active input"
+                ).val(),
+                group_password: group_password
             };
 
             if (mode == "edit") {
@@ -92,7 +100,7 @@ module.exports = new function() {
                 ).val();
             }
             //if group is public, find other options
-            if (is_public == "0" && mode == "create") {
+            if (is_public == "0" && (mode == "create" || mode == "edit")) {
                 params.password = $(
                     "#tab-groups .tab-pane.active  #group-private #group-password"
                 ).val();
@@ -111,10 +119,14 @@ module.exports = new function() {
             } else {
                 request.post(data, data => {
                     if (data.flag) {
-                        $("#tab-groups .tab-pane.active  #group_name").val("");
+                        $("#tab-create-groups input").val("");
                         message.show(data.msg, "success");
-                        this.fetchGroups();
-                        $("#edit-group-cancel-btn").click();
+                        this.fetchGroups(() => {
+                            $("a[href='#tab-manage-groups']").click();
+                            $(
+                                `#tab-manage-groups #groups-dd option[value='${data.gid}']`
+                            ).attr("selected", "selected");
+                        });
                     } else {
                         message.show(data.msg, "warning");
                     }
@@ -141,6 +153,7 @@ module.exports = new function() {
                         .removeClass("group-leave red")
                         .addClass("group-join green")
                         .html("Join");
+                    this.fetchGroups();
                     message.show(data.msg, "success");
                 } else {
                     message.show(data.msg, "warning");
@@ -149,9 +162,9 @@ module.exports = new function() {
         });
     };
     this.joinPublicGroup = e => {
+        e.preventDefault();
         var $handle = $(e.target);
-        var group_id = $handle.parents("tr").data("gid");
-
+        var group_id = $handle.parents(".group_row").data("gid");
         auth.getUserId(chrome_id => {
             var params = {
                 action: "joinPublicGroup",
@@ -166,6 +179,7 @@ module.exports = new function() {
                         .removeClass("group-join green")
                         .addClass("group-leave red")
                         .html("Leave");
+                    this.fetchGroups();
                     message.show(data.msg, "success");
                 } else {
                     message.show(data.msg, "warning");
@@ -202,7 +216,9 @@ module.exports = new function() {
     };
     this.makeGroupDefault = selector => {
         var defaultGroup = $(selector).val();
-        var name = $(selector).find("option:selected").text();
+        var name = $(selector)
+            .find("option:selected")
+            .text();
         storage.setItem("defaultGroup", defaultGroup);
         storage.setItem("defaultGroupName", name);
         message.show("Default group set to " + name, "success");
@@ -241,7 +257,9 @@ module.exports = new function() {
                 request.get(data, data => {
                     var html = "";
                     data.forEach((item, i) => {
-                        var $html = $("#users-template").clone().find("tbody");
+                        var $html = $("#users-template")
+                            .clone()
+                            .find("tbody");
                         var remove = item.id == admin_id ? "" : "remove";
                         html += $html
                             .html()
@@ -312,7 +330,7 @@ module.exports = new function() {
                         item.status == "1"
                             ? "<a href='#' class='red group-leave'>Leave</a>"
                             : "<a href='#' class='green group-join'>Join</a>";
-                    html += `<tr data-gid="${item.id}">
+                    html += `<tr class="group_row" data-gid="${item.id}">
                                 <td>
                                     <a href="#" class="group-name"><strong>${item.name}</strong></a>
                                 </td>
@@ -368,9 +386,12 @@ module.exports = new function() {
         let $option = $("#tab-manage-groups #groups-dd option:selected");
 
         //update group name
-        $handle
-            .find("#inputGroupCreate")
-            .val($option.text().replace("(admin)", "").trim());
+        $handle.find("#inputGroupCreate").val(
+            $option
+                .text()
+                .replace("(admin)", "")
+                .trim()
+        );
         //update group desc
         $handle.find("#inputGrpDesc").val($option.data("desc"));
         //update private/public visibility
@@ -391,36 +412,197 @@ module.exports = new function() {
         var group_id = $("#tab-manage-groups #groups-dd option:selected").val();
 
         auth.getUserId(chrome_id => {
-            request.post(
-                "name=" +
-                    group_name +
-                    "&group_id=" +
-                    group_id +
-                    "&chrome_id=" +
-                    chrome_id +
-                    "&action=editGroupSave",
-                data => {
-                    if (data.flag) {
-                        $(".editgroup-block").addClass("hide");
-                        message.show(data.msg, "success");
-                        $("#edit-group").removeClass("hide");
-                        $("#groups-dd option[value='" + group_id + "']").html(
+            var params = {
+                name: group_name,
+                group_id: group_id,
+                chrome_id: chrome_id,
+                action: "editGroupSave"
+            };
+            params = common.getDataString(params);
+            request.post(params, data => {
+                if (data.flag) {
+                    $(".editgroup-block").addClass("hide");
+                    message.show(data.msg, "success");
+                    $("#edit-group").removeClass("hide");
+                    $("#groups-dd option[value='" + group_id + "']").html(
+                        group_name + "(admin)"
+                    );
+
+                    if (storage.getItem("defaultGroup") == group_id) {
+                        storage.setItem(
+                            "defaultGroupName",
                             group_name + "(admin)"
                         );
-
-                        if (storage.getItem("defaultGroup") == group_id) {
-                            storage.setItem(
-                                "defaultGroupName",
-                                group_name + "(admin)"
-                            );
-                            $("#group-display").html(group_name + "(admin)");
-                        }
-                    } else {
-                        //$("#edit-group").removeClass('hide');
-                        message.show(data.msg, "warning");
+                        $("#group-display").html(group_name + "(admin)");
                     }
+                } else {
+                    //$("#edit-group").removeClass('hide');
+                    message.show(data.msg, "warning");
                 }
-            );
+            });
+        });
+    };
+    this.acceptInvite = e => {
+        let $item = $(e.currentTarget).parents(".group_row");
+        var $notificationItem = $(e.currentTarget).parents(
+            ".notification-item"
+        );
+
+        auth.getUserId(chrome_id => {
+            var params = {
+                group_id: $item.data("gid"),
+                activity_id: $item.data("aid"),
+                chrome_id: chrome_id,
+                action: "acceptGroupInvite"
+            };
+            params = common.getDataString(params);
+            request.post(params, data => {
+                $notificationItem.remove();
+                message.show(data.msg, "success");
+            });
+        });
+    };
+
+    this.rejectInvite = e => {
+        let $item = $(e.currentTarget).parents(".group_row");
+        var $notificationItem = $(e.currentTarget).parents(
+            ".notification-item"
+        );
+
+        auth.getUserId(chrome_id => {
+            var params = {
+                group_id: $item.data("gid"),
+                activity_id: $item.data("aid"),
+                chrome_id: chrome_id,
+                action: "rejectGroupInvite"
+            };
+            params = common.getDataString(params);
+            request.post(params, data => {
+                $notificationItem.remove();
+                message.show(data.msg, "success");
+            });
+        });
+    };
+
+    this.sendInvites = () => {
+        let invites = this.invites.map(user => {
+            return user.id;
+        });
+        auth.getUserId(chrome_id => {
+            var params = {
+                group_id: $("#invite-modal").attr("data-gid"),
+                users: JSON.stringify(invites),
+                chrome_id: chrome_id,
+                action: "sendInvites"
+            };
+            params = common.getDataString(params);
+            request.post(params, data => {
+                $("#invite-modal").modal("hide");
+                message.show("Invites sent successfully.", "success");
+            });
+        });
+    };
+
+    this.inviteUsers = (resetInvites = true) => {
+        let group_id = $("#tab-manage-groups #groups-dd").val();
+        $("#invite-modal")
+            .attr("data-gid", group_id)
+            .modal();
+        auth.getUserId(chrome_id => {
+            var params = {
+                group_id: group_id,
+                chrome_id: chrome_id,
+                action: "getUsersToInvite"
+            };
+            params = common.getDataString(params);
+            request.post(params, data => {
+                this.setInviteList(data.users, resetInvites);
+                this.editInvites(data.invites);
+            });
+        });
+    };
+    this.editInvites = data => {
+        let users = data.map(user => {
+            return `<div class="invite"><span>${user.nickname}</span><span><a inviteId="${user.invite_id}" class="withdraw-invite" href="#">Withdraw</a></span></div>`;
+        });
+        let markup = users.join("");
+        if (markup == "") {
+            markup = "No pending invites...";
+        }
+        $("#sent-invites").html(markup);
+    };
+    this.setInviteList = (data, resetInvites) => {
+        let dataClone = data;
+        if (resetInvites) {
+            this.invites = [];
+        }
+        const init = () => {
+            dataClone = dataClone.sort((a, b) => {
+                return b.nickname - a.nickname;
+            });
+            $(
+                ".token-input-list-facebook, .token-input-dropdown-facebook"
+            ).remove();
+            $("#tags-input-send-invites").tokenInput(dataClone, {
+                theme: "facebook",
+                preventDuplicates: true,
+                searchDelay: 0,
+                propertyToSearch: "nickname",
+                prePopulate: this.invites,
+                resultsLimit: 5,
+                debug: true,
+                onAdd: user => {
+                    dataClone = dataClone.filter(item => {
+                        return item.id != user.id;
+                    });
+                    this.invites.push(user);
+                    init();
+                },
+                onDelete: user => {
+                    this.invites = this.invites.filter(item => {
+                        return user.id !== item.id;
+                    });
+                    data.map(item => {
+                        if (item.id == user.id) {
+                            dataClone.push(item);
+                            init();
+                            return false;
+                        }
+                    });
+                },
+                onResult: function(results) {
+                    var tagsearch = $(
+                        "#token-input-tags-input-send-invites"
+                    ).val();
+                    return results.filter(item => {
+                        return (
+                            item.nickname
+                                .toLowerCase()
+                                .indexOf(tagsearch.toLowerCase()) === 0
+                        );
+                    });
+                }
+            });
+            $("#token-input-tags-input-send-invites").focus();
+        };
+        init();
+    };
+    this.withrawInvite = e => {
+        let inviteId = $(e.currentTarget).attr("inviteId");
+        let group_id = $("#tab-manage-groups #groups-dd").val();
+        let $item = $(e.currentTarget).parents(".invite");
+        auth.getUserId(chrome_id => {
+            var params = {
+                group_id: group_id,
+                invite_id: inviteId,
+                chrome_id: chrome_id,
+                action: "withdrawInvite"
+            };
+            params = common.getDataString(params);
+            request.post(params, data => {
+                $item.remove();
+                this.inviteUsers(false);
+            });
         });
     };
 }();

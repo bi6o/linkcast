@@ -67,6 +67,18 @@ $.post = function(url, data, callback, async) {
     $.send(url, callback, "POST", query.join("&"), async);
 };
 
+var templates = {
+    link: "{NICKNAME} posted {TITLE} in {GROUP_NAME}",
+    like: "{NICKNAME} liked  {TITLE}",
+    comment: "{NICKNAME} commented - {COMMENT} on {NICKNAME}'s link",
+    joined_group: "{NICKNAME} joined the group {GROUP_NAME}",
+    joined_linkcast: "{NICKNAME} joined Linkcast",
+    new_group: "{NICKNAME} created a new group - {GROUP_NAME}",
+    group_invite: "{NICKNAME} invited you to join {GROUP_NAME}",
+    group_invite_rejected:
+        "{NICKNAME} rejected your invite to join {GROUP_NAME}"
+};
+
 var NEW_NOTIFICATION = false;
 /**
  * @param  Update noticcation count of the extension
@@ -115,22 +127,52 @@ var getNotifications = function(callback) {
     callback(countData);
 };
 
-var getTitle = function(linkCount, commentCount, word) {
+var getTitle = function(linkCount, commentCount, likeCount, others) {
     const getVerb = (count, word) => {
         return count > 1 ? word + "s" : word;
     };
-    var msg = "You have got ";
-    if (linkCount > 0) {
-        msg += linkCount + " " + getVerb(linkCount, "link");
+    let totalNotifications = linkCount + commentCount + likeCount + others;
+    return `You have got ${totalNotifications} ${getVerb(
+        totalNotifications,
+        "notification"
+    )}`;
+};
+var getFormatedText = function(activity) {
+    //activity type
+    var type = activity.type;
+    var template = templates[type];
+    if (!template) {
+        return "Couldn't decode the message. Maybe something very personal";
     }
+    var text = template.replace(/{(.*?)}/gi, function(variable) {
+        // convert {VAR} to VAR
+        variable = variable.substring(1, variable.length - 1).toLowerCase();
 
-    if (commentCount > 0) {
-        if (linkCount > 0) {
-            msg += " and ";
-        }
-        msg += commentCount + " " + getVerb(commentCount, "comment");
+        return activity[variable];
+    });
+    return text;
+};
+var getEmoji = function(type) {
+    switch (type) {
+        case "like":
+            return "❤️";
+        case "link":
+            return "🔗";
+        case "comment":
+            return "🗣";
+        case "joined_linkcast":
+            return "🙍🏻";
+        case "joined_group":
+            return "👨‍👨‍👦‍👦";
+        case "group_invite":
+            return "✉️";
+        case "group_invite_rejected":
+            return "😏";
+        case "linkcast":
+            return "📣";
+        default:
+            return "";
     }
-    return msg;
 };
 //Start polling
 setInterval(function() {
@@ -143,9 +185,11 @@ setInterval(function() {
                 $.get(
                     endpoint,
                     {
+                        handle: "tab-notifications",
                         group: group,
-                        action: "getActivities",
+                        action: "readTracks",
                         bg: 1,
+                        count: null,
                         chrome_id: userid
                     },
                     function(response) {
@@ -179,25 +223,32 @@ setInterval(function() {
                             ) {
                                 var itemList = [];
                                 var linkCount = 0;
+                                var likeCount = 0;
                                 var commentCount = 0;
-
+                                var others = 0;
                                 data.rows.forEach(activity => {
                                     var type = "link";
                                     if (activity.type == "link") {
                                         linkCount++;
                                     } else if (activity.type == "comment") {
                                         commentCount++;
+                                    } else if (activity.type == "like") {
+                                        likeCount++;
+                                    } else {
+                                        others++;
                                     }
-                                    var regex_clean = /<\/?[^>]+(>|$)/g;
+                                    var title = getFormatedText(activity);
                                     itemList.push({
-                                        title: activity.template.replace(
-                                            regex_clean,
-                                            ""
-                                        ),
-                                        message: activity.type
+                                        title: title,
+                                        message: getEmoji(activity.type)
                                     });
                                 });
-                                var title = getTitle(linkCount, commentCount);
+                                var title = getTitle(
+                                    linkCount,
+                                    commentCount,
+                                    likeCount,
+                                    others
+                                );
 
                                 var options = {
                                     type: "list",
@@ -248,11 +299,14 @@ var updateVersion = function() {
                 //login the user
                 $.get(
                     endpoint,
-                    { chrome_id: response.userid, action: "fetchUserInfo" },
+                    {
+                        chrome_id: response.userid,
+                        action: "fetchUserInfo"
+                    },
                     function(response) {
-                        var result = JSON.parse(result);
+                        var result = JSON.parse(response);
                         if (typeof localStorage.chrome_id == "undefined") {
-                            localStorage.nickname = result.data.nickname;
+                            localStorage.ACTORS = result.data.ACTORS;
                             localStorage.loggedIn = true;
                             localStorage.chrome_id = response.userid;
                             localStorage.richNotification = 1;
