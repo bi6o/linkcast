@@ -68,9 +68,9 @@ $.post = function(url, data, callback, async) {
 };
 
 var templates = {
-    link: "{NICKNAME} posted {TITLE} in {GROUP_NAME}",
-    like: "{NICKNAME} liked  {TITLE}",
-    comment: "{NICKNAME} commented - {COMMENT} on {NICKNAME}'s link",
+    link: "{POSTER} posted {TITLE} in {GROUP_NAME}",
+    like: "{NICKNAME} liked {POSTER}'s link - {TITLE}",
+    comment: "{NICKNAME} commented - {COMMENT} on {POSTER}'s link",
     joined_group: "{NICKNAME} joined the group {GROUP_NAME}",
     joined_linkcast: "{NICKNAME} joined Linkcast",
     new_group: "{NICKNAME} created a new group - {GROUP_NAME}",
